@@ -7,6 +7,10 @@
 
 namespace craft\generator\helpers;
 
+use PhpParser\Node;
+use PhpParser\Node\Stmt;
+use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter\Standard;
 use yii\base\InvalidArgumentException;
 
 /**
@@ -81,5 +85,39 @@ abstract class Code
         // Classes/namespaces must only consist of alphanumeric characters and underscores,
         // and cannot begin with a number
         return preg_match('/^[a-z_]\w*(\\\\[a-z_]\w*)*$/i', $class);
+    }
+
+    /**
+     * Parses a PHP code snippet into statement nodes.
+     *
+     * @param string $snippet
+     * @return Stmt[]
+     */
+    public static function parseSnippet(string $snippet): array
+    {
+        $parser = (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
+        return $parser->parse("<?php\n$snippet") ?? [];
+    }
+
+    /**
+     * Formats a PHP code snippet.
+     *
+     * @param string $code
+     * @return string
+     */
+    public static function formatSnippet(string $code): string
+    {
+        return self::printSnippet(self::parseSnippet($code));
+    }
+
+    /**
+     * Prints out a PHP code snippet from nodes.
+     *
+     * @param Node[] $stmts
+     * @return string
+     */
+    public static function printSnippet(array $stmts): string
+    {
+        return preg_replace('/^<\?php\s*/', '', (new Standard())->prettyPrint($stmts));
     }
 }

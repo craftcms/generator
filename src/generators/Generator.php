@@ -135,11 +135,12 @@ PHP);
         $message = "**$this->ucfirstDisplayName generator created!**";
         if (
             !$this->module instanceof Application &&
-            !$this->addRegistrationEventCode(
+            !$this->addRegistrationEventHandlerCode(
                 CommandCommand::class,
                 'EVENT_REGISTER_GENERATOR_TYPES',
                 "$this->namespace\\$this->className",
                 $fallbackExample,
+                true,
             )
         ) {
             $moduleFile = $this->moduleFile();

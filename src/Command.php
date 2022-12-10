@@ -11,7 +11,6 @@ use Craft;
 use craft\composer\InvalidPluginException;
 use craft\console\Controller;
 use craft\events\RegisterComponentTypesEvent;
-use craft\generator\BaseGenerator;
 use craft\generator\helpers\Code;
 use craft\generator\helpers\Composer;
 use craft\helpers\ArrayHelper;
@@ -32,16 +31,19 @@ class Command extends Controller
      * Generator types must extend [[BaseGenerator]].
      * ---
      * ```php
-     * use craft\generator\Command;
      * use craft\events\RegisterComponentTypesEvent;
+     * use craft\generator\Command;
      * use yii\base\Event;
      *
-     * Event::on(MakeController::class,
-     *     Fields::EVENT_REGISTER_GENERATOR_TYPES,
-     *     function(RegisterComponentTypesEvent $event) {
-     *         $event->types[] = MyGenerator::class;
-     *     }
-     * );
+     * if (class_exists(Command::class)) {
+     *     Event::on(
+     *         Command::class,
+     *         Command::EVENT_REGISTER_GENERATOR_TYPES,
+     *         function(RegisterComponentTypesEvent $event) {
+     *             $event->types[] = MyGenerator::class;
+     *         }
+     *     );
+     * }
      * ```
      */
     public const EVENT_REGISTER_GENERATOR_TYPES = 'registerGeneratorTypes';

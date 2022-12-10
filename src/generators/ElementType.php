@@ -11,6 +11,8 @@ use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\events\RegisterUrlRulesEvent;
 use craft\generator\BaseGenerator;
+use craft\generator\helpers\Code;
+use craft\generator\Workspace;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
@@ -72,7 +74,7 @@ class ElementType extends BaseGenerator
         if (!$this->module instanceof Application) {
             $moduleFile = $this->moduleFile();
 
-            if (!$this->addRegistrationEventCode(
+            if (!$this->addRegistrationEventHandlerCode(
                 Elements::class,
                 'EVENT_REGISTER_ELEMENT_TYPES',
                 "$this->namespace\\$this->className",
@@ -88,17 +90,26 @@ $fallbackExample
 MD;
             }
 
-            if (!$this->addEventCode(
-                UrlManager::class,
-                'EVENT_REGISTER_CP_URL_RULES',
-                RegisterUrlRulesEvent::class,
-                [],
-                fn() => <<<PHP
+            $fallbackExample = null;
+            if (!$this->modifyModuleFile(function(Workspace $workspace) use (&$fallbackExample) {
+                $handlerCode = <<<PHP
 \$event->rules['$this->pluralKebabCasedName'] = ['template' => '{$this->module->id}/$this->pluralKebabCasedName/_index.twig'];
 \$event->rules['$this->pluralKebabCasedName/<elementId:\d+>'] = 'elements/edit';
-PHP,
-                $fallbackExample
-            )) {
+PHP;
+                $eventCode = $workspace->prepareEventHandlerCode(
+                    UrlManager::class,
+                    'EVENT_REGISTER_CP_URL_RULES',
+                    RegisterUrlRulesEvent::class,
+                    $handlerCode,
+                );
+
+                if (!$workspace->appendToMethod('attachEventHandlers', $eventCode)) {
+                    $fallbackExample = $workspace->printNewImports() . Code::formatSnippet($eventCode);
+                    return false;
+                }
+
+                return true;
+            })) {
                 $message .= "\n" . <<<MD
 Add the following code to `$moduleFile` to register URL rules for the element index and edit pages:
 

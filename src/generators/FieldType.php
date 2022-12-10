@@ -108,7 +108,7 @@ class FieldType extends BaseGenerator
         $message = "**Field type created!**";
         if (
             !$this->module instanceof Application &&
-            !$this->addRegistrationEventCode(
+            !$this->addRegistrationEventHandlerCode(
                 Fields::class,
                 'EVENT_REGISTER_FIELD_TYPES',
                 "$this->namespace\\$this->className",
