@@ -1,0 +1,72 @@
+{
+  "name": "craftcms/generator",
+  "description": "Craft CMS component generator",
+  "type": "yii2-extension",
+  "keywords": [
+    "cms",
+    "craftcms",
+    "yii2"
+  ],
+  "homepage": "https://craftcms.com",
+  "license": "mit",
+  "authors": [
+    {
+      "name": "Pixel & Tonic",
+      "homepage": "https://pixelandtonic.com/"
+    }
+  ],
+  "support": {
+    "email": "support@craftcms.com",
+    "issues": "https://github.com/craftcms/generator/issues?state=open",
+    "source": "https://github.com/craftcms/generator",
+    "rss": "https://github.com/craftcms/generator/releases.atom"
+  },
+  "require": {
+    "php": "^8.0.2",
+    "craftcms/cms": "^4.3.5",
+    "nette/php-generator": "^4.0",
+    "nikic/php-parser": "^4.15"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main",
+    "pestphp/pest": "^1.22"
+  },
+  "autoload": {
+    "psr-4": {
+      "craft\\generator\\": "src/"
+    }
+  },
+  "extra": {
+    "bootstrap": "craft\\generator\\Extension"
+  },
+  "scripts": {
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix",
+    "codecept-build": "codecept build",
+    "phpstan": "phpstan --memory-limit=1G",
+    "test": "pest"
+  },
+  "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "8.0.2"
+    },
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true,
+      "pestphp/pest-plugin": true
+    }
+  },
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../cms",
+      "options": {
+        "versions": {
+          "craftcms/cms": "4.3.5"
+        }
+      }
+    }
+  ]
+}

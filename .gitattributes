@@ -1,0 +1,15 @@
+# Do not export those files in the Composer archive (lighter dependency)
+/.git-blame-ignore-revs export-ignore
+/.gitattributes export-ignore
+/.github/ export-ignore
+/.gitignore export-ignore
+/CHANGELOG.md export-ignore
+/README.md export-ignore
+/composer.lock export-ignore
+/ecs.php export-ignore
+/phpstan.neon export-ignore
+/stubs/ export-ignore
+/tests/ export-ignore
+
+# Auto detect text files and perform LF normalization
+* text=auto

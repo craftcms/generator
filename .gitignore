@@ -1,0 +1,5 @@
+*.DS_Store
+*Thumbs.db
+.idea
+.php-cs-fixer.cache
+vendor
