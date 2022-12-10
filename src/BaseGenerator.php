@@ -21,7 +21,6 @@ use Nette\PhpGenerator\Factory;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
-use PhpParser\Node\Name;
 use ReflectionClass;
 use ReflectionClassConstant;
 use ReflectionException;
@@ -29,9 +28,8 @@ use ReflectionMethod;
 use ReflectionProperty;
 use yii\base\Application;
 use yii\base\BaseObject;
-use yii\base\Event;
 use yii\base\InvalidArgumentException;
-use yii\base\Module as BaseModule;
+use yii\base\Module;
 use yii\base\NotSupportedException;
 
 /**
@@ -83,9 +81,9 @@ abstract class BaseGenerator extends BaseObject
     public Command $command;
 
     /**
-     * @var BaseModule|null The module that the generator is working with, if not the Craft project itself.
+     * @var Module|null The module that the generator is working with, if not the Craft project itself.
      */
-    public ?BaseModule $module;
+    public ?Module $module;
 
     /**
      * @var string The base path that the generator is working with.
