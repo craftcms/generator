@@ -1,6 +1,6 @@
 # Craft Generator
 
-Craft Generator can be used to scaffold new Craft CMS plugins, modules, and system components from the CLI.
+Scaffold new Craft CMS plugins, modules, and system components from the CLI.
 
 ## Installation
 
