@@ -2,4 +2,5 @@
 *Thumbs.db
 .idea
 .php-cs-fixer.cache
+.phpunit.result.cache
 vendor
