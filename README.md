@@ -56,11 +56,17 @@ php craft make queue-job
 php craft make widget-type
 ```
 
-All component commands require one of the following options to be passed:
+All component generation commands require one of the following options to be passed, which identify where the component is going to live:
 
 - `--app`
 - `--module=<module-id>`
 - `--plugin=<plugin-handle>`
+
+For example, if you’re creating a new field type for a plugin called `foo-bar`, you would run:
+
+```sh
+php craft make field-type --plugin=foo-bar
+```
 
 ## Creating custom generators
 
@@ -70,4 +76,11 @@ If you have a plugin that has its own component type that could benefit from a c
 php craft make generator --plugin=<plugin-handle>
 ```
 
-You’ll be guided through 
+You’ll be presented with the following prompts:
+
+- **Generator name**: Your generator’s class name (sans namespace)
+- **Generator namespace**: The namespace your generator class should live in
+- **Base class for generated [type]**: An existing base class which generated classes should extend
+- **Default namespace for generated [type]**: The default namespace which the generator should suggest, relative to the plugin/module’s root namespace
+
+Your generator will be created based on the provided class name and namespace, which extends [`craft\generator\BaseGenerator`](src/BaseGenerator.php).
