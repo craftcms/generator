@@ -15,6 +15,8 @@ use yii\base\InvalidArgumentException;
 
 /**
  * Code helper
+ *
+ * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  */
 abstract class Code
 {

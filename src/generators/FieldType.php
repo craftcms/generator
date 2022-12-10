@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link https://craftcms.com/
+ * @copyright Copyright (c) Pixel & Tonic, Inc.
+ * @license MIT
+ */
 
 namespace craft\generator\generators;
 
@@ -25,6 +30,8 @@ use yii\web\Application;
 
 /**
  * Creates a new field type.
+ *
+ * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  */
 class FieldType extends BaseGenerator
 {

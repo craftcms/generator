@@ -16,7 +16,6 @@ use yii\base\Module as YiiModule;
  * Creates a new application module.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 4.4.0
  */
 class Module extends BaseGenerator
 {

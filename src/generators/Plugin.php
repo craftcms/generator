@@ -24,7 +24,6 @@ use yii\validators\EmailValidator;
  * Creates a new Craft plugin.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 4.4.0
  */
 class Plugin extends BaseGenerator
 {

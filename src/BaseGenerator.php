@@ -36,7 +36,6 @@ use yii\base\NotSupportedException;
  * Base generator class.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 4.4.0
  */
 abstract class BaseGenerator extends BaseObject
 {

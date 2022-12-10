@@ -15,6 +15,8 @@ use yii\base\InvalidArgumentException;
 
 /**
  * Composer helper
+ *
+ * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  */
 abstract class Composer
 {

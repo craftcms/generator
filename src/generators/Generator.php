@@ -20,7 +20,6 @@ use yii\helpers\Inflector;
  * Creates a new component generator.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 4.4.0
  */
 class Generator extends BaseGenerator
 {

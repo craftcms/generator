@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link https://craftcms.com/
+ * @copyright Copyright (c) Pixel & Tonic, Inc.
+ * @license MIT
+ */
 
 namespace craft\generator\generators;
 
@@ -10,6 +15,8 @@ use yii\helpers\Inflector;
 
 /**
  * Creates a new queue job.
+ *
+ * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  */
 class QueueJob extends BaseGenerator
 {

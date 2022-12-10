@@ -21,7 +21,6 @@ use yii\web\Response;
  * Creates a new web controller.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 4.4.0
  */
 class Controller extends BaseGenerator
 {

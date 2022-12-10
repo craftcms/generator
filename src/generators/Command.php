@@ -20,7 +20,6 @@ use yii\console\ExitCode;
  * Creates a new console command.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 4.4.0
  */
 class Command extends BaseGenerator
 {

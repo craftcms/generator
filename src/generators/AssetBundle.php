@@ -19,7 +19,6 @@ use yii\helpers\Inflector;
  * Creates a new asset bundle.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 4.4.0
  */
 class AssetBundle extends BaseGenerator
 {
