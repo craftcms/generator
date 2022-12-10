@@ -40,7 +40,7 @@ class Generator extends BaseGenerator
         ]);
 
         $this->namespace = $this->namespacePrompt('Generator namespace:', [
-            'default' => "$this->baseNamespace\\console\\generators",
+            'default' => "$this->baseNamespace\\generators",
         ]);
 
         $this->displayName = Inflector::camel2words($this->className);
