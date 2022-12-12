@@ -774,7 +774,10 @@ abstract class BaseGenerator extends BaseObject
         ) {
             $eventCode = $workspace->prepareRegistrationEventHandlerCode($class, $event, $componentClass, $ensureClassExists);
 
-            if (!$workspace->appendCodeToMethod($eventCode, 'attachEventHandlers')) {
+            if (
+                !$workspace->appendCodeToMethod($eventCode, 'attachEventHandlers') &&
+                !$workspace->appendCodeToMethod($eventCode, 'init')
+            ) {
                 $fallbackExample = $workspace->printNewImports() . Code::formatSnippet($eventCode);
                 return false;
             }
