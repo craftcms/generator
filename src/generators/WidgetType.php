@@ -47,7 +47,7 @@ class WidgetType extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName widget type");
+        $class->setComment("$this->displayName widget type");
 
         $this->writePhpClass($namespace);
 

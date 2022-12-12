@@ -59,7 +59,7 @@ class Service extends BaseGenerator
         $class = $this->createClass($this->className, Component::class);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName service");
+        $class->setComment("$this->displayName service");
 
         $this->writePhpClass($namespace);
 

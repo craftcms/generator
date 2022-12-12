@@ -47,7 +47,7 @@ class ElementExporter extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName element exporter");
+        $class->setComment("$this->displayName element exporter");
 
         $this->writePhpClass($namespace);
 

@@ -45,7 +45,7 @@ class ElementAction extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName element action");
+        $class->setComment("$this->displayName element action");
 
         $this->writePhpClass($namespace);
 

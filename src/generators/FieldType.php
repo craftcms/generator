@@ -98,7 +98,7 @@ class FieldType extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName field type");
+        $class->setComment("$this->displayName field type");
 
         if ($this->previewable) {
             $namespace->addUse(PreviewableFieldInterface::class);

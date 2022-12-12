@@ -49,7 +49,7 @@ class FilesystemType extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName filesystem type");
+        $class->setComment("$this->displayName filesystem type");
 
         $this->writePhpClass($namespace);
 

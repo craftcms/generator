@@ -74,7 +74,7 @@ class Generator extends BaseGenerator
             self::CLASS_METHODS => $this->methods(),
         ]);
         $namespace->add($class);
-        $class->addComment("Creates a new $this->lowerDisplayName.");
+        $class->setComment("Creates a new $this->lowerDisplayName.");
 
         $class->addProperty('className')
             ->setPrivate()
@@ -184,7 +184,7 @@ MD;
 ]);
 \$namespace->add(\$class);
 
-\$class->addComment("\$this->displayName $this->lowerDisplayName");
+\$class->setComment("\$this->displayName $this->lowerDisplayName");
 
 \$this->writePhpClass(\$namespace);
 

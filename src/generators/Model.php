@@ -45,7 +45,7 @@ class Model extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName model");
+        $class->setComment("$this->displayName model");
 
         $this->writePhpClass($namespace);
 

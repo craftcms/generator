@@ -49,7 +49,7 @@ class Utility extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName utility");
+        $class->setComment("$this->displayName utility");
 
         $this->writePhpClass($namespace);
 

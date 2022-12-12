@@ -50,7 +50,7 @@ class Controller extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment(sprintf('%s controller', StringHelper::toTitleCase(str_replace('-', ' ', $id))));
+        $class->setComment(sprintf('%s controller', StringHelper::toTitleCase(str_replace('-', ' ', $id))));
 
         $uniqueId = $this->module instanceof Application ? $id : sprintf('%s/%s', $this->module->getUniqueId(), $id);
         $class->addMethod('actionFooBar')

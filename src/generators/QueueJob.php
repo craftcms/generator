@@ -45,7 +45,7 @@ class QueueJob extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName queue job");
+        $class->setComment("$this->displayName queue job");
 
         $this->writePhpClass($namespace);
 

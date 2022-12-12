@@ -50,7 +50,7 @@ class Command extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment(sprintf('%s controller', StringHelper::toTitleCase(str_replace('-', ' ', $id))));
+        $class->setComment(sprintf('%s controller', StringHelper::toTitleCase(str_replace('-', ' ', $id))));
 
         $uniqueId = $this->module instanceof Application ? $relId : sprintf('%s/%s', $this->module->getUniqueId(), $relId);
         $class->addMethod('actionIndex')

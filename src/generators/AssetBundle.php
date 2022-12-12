@@ -52,7 +52,7 @@ class AssetBundle extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName asset bundle");
+        $class->setComment("$this->displayName asset bundle");
 
         $this->writePhpClass($namespace);
 

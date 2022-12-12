@@ -106,7 +106,7 @@ class ElementConditionRule extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName element condition rule");
+        $class->setComment("$this->displayName element condition rule");
 
         $this->writePhpClass($namespace);
 

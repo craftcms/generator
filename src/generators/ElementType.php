@@ -148,7 +148,7 @@ MD;
         ]);
         $namespace->add($class);
 
-        $class->addComment(sprintf('%s element type', StringHelper::toTitleCase($this->displayName)));
+        $class->setComment(sprintf('%s element type', StringHelper::toTitleCase($this->displayName)));
 
         $this->writePhpClass($namespace);
     }
@@ -324,7 +324,7 @@ PHP,
         ]);
         $namespace->add($class);
 
-        $class->addComment(sprintf('%s query', StringHelper::toTitleCase($this->displayName)));
+        $class->setComment(sprintf('%s query', StringHelper::toTitleCase($this->displayName)));
 
         $this->writePhpClass($namespace);
     }
@@ -355,7 +355,7 @@ PHP,
         ]);
         $namespace->add($class);
 
-        $class->addComment(sprintf('%s condition', StringHelper::toTitleCase($this->displayName)));
+        $class->setComment(sprintf('%s condition', StringHelper::toTitleCase($this->displayName)));
 
         $this->writePhpClass($namespace);
     }

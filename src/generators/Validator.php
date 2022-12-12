@@ -45,7 +45,7 @@ class Validator extends BaseGenerator
         ]);
         $namespace->add($class);
 
-        $class->addComment("$this->displayName validator");
+        $class->setComment("$this->displayName validator");
 
         $this->writePhpClass($namespace);
 
