@@ -49,3 +49,58 @@ test('validateClass', function(string $class, bool $expected) {
     ['foo\\', false],
     ['foo \\bar\\baz', false],
 ]);
+
+test('unformatDocComment', function(string $comment, string $expected) {
+    expect(Code::unformatDocComment($comment))->toBe($expected);
+})->with([
+    [
+        <<<EOD
+/**
+ * Foo plugin
+ *
+ * @method static Foo getInstance()
+ * @method Settings getSettings()
+ * @author Pixel & Tonic
+ * @copyright Pixel & Tonic
+ * @license MIT
+ */
+EOD,
+        <<<EOD
+Foo plugin
+
+@method static Foo getInstance()
+@method Settings getSettings()
+@author Pixel & Tonic
+@copyright Pixel & Tonic
+@license MIT
+EOD,
+    ],
+]);
+
+test('formatDocComment', function(string $comment, string $expected) {
+    expect(Code::formatDocComment($comment))->toBe($expected);
+})->with([
+    [
+        <<<EOD
+Foo plugin
+
+@method static Foo getInstance()
+@method Settings getSettings()
+@author Pixel & Tonic
+@copyright Pixel & Tonic
+@license MIT
+EOD,
+        <<<EOD
+/**
+ * Foo plugin
+ *
+ * @method static Foo getInstance()
+ * @method Settings getSettings()
+ * @author Pixel & Tonic
+ * @copyright Pixel & Tonic
+ * @license MIT
+ */
+EOD,
+    ],
+    [' ', ''],
+]);

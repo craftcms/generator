@@ -575,8 +575,7 @@ abstract class BaseGenerator extends BaseObject
         }
 
         // Clean it up
-        // (copied from @internal Nette\PhpGenerator\Helpers::unformatDocComment())
-        $docBlock = preg_replace('#^\s*\* ?#m', '', trim(trim(trim($comment), '/*')));
+        $docBlock = Code::unformatDocComment($comment);
 
         // Parse any @inheritdoc tags
         $docBlock = preg_replace_callback('/\{?@inheritdoc\}?/i', function(array $match) use ($member): string {
@@ -775,7 +774,7 @@ abstract class BaseGenerator extends BaseObject
         ) {
             $eventCode = $workspace->prepareRegistrationEventHandlerCode($class, $event, $componentClass, $ensureClassExists);
 
-            if (!$workspace->appendToMethod('attachEventHandlers', $eventCode)) {
+            if (!$workspace->appendCodeToMethod($eventCode, 'attachEventHandlers')) {
                 $fallbackExample = $workspace->printNewImports() . Code::formatSnippet($eventCode);
                 return false;
             }

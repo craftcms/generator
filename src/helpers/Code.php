@@ -7,6 +7,7 @@
 
 namespace craft\generator\helpers;
 
+use Nette\Utils\Strings;
 use PhpParser\Node;
 use PhpParser\Node\Stmt;
 use PhpParser\ParserFactory;
@@ -87,6 +88,36 @@ abstract class Code
         // Classes/namespaces must only consist of alphanumeric characters and underscores,
         // and cannot begin with a number
         return preg_match('/^[a-z_]\w*(\\\\[a-z_]\w*)*$/i', $class);
+    }
+
+    /**
+     * Removes PHP comment formatting from a DocBlock comment.
+     *
+     * @param string $comment
+     * @return string
+     */
+    public static function unformatDocComment(string $comment): string
+    {
+        // (copied from @internal Nette\PhpGenerator\Helpers::unformatDocComment())
+        return preg_replace('#^\s*\* ?#m', '', trim(trim(trim($comment), '/*')));
+    }
+
+    /**
+     * Adds PHP comment formatting to a DocBlock comment.
+     *
+     * @param string $comment
+     * @return string
+     */
+    public static function formatDocComment(string $comment): string
+    {
+        // (copied from @internal Nette\PhpGenerator\Helpers::formatDocComment())
+        $s = trim($comment);
+        $s = str_replace('*/', '* /', $s);
+        if ($s === '') {
+            return '';
+        }
+        $s = str_replace("\n", "\n * ", "/**\n$s") . "\n */";
+        return Strings::normalize($s);
     }
 
     /**
