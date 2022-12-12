@@ -110,7 +110,7 @@ PHP;
                     $handlerCode,
                 );
 
-                if (!$workspace->appendToMethod('attachEventHandlers', $eventCode)) {
+                if (!$workspace->appendCodeToMethod($eventCode, 'attachEventHandlers')) {
                     $fallbackExample = $workspace->printNewImports() . Code::formatSnippet($eventCode);
                     return false;
                 }

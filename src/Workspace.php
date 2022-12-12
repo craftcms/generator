@@ -10,17 +10,23 @@ namespace craft\generator;
 use craft\events\RegisterComponentTypesEvent;
 use craft\generator\helpers\Code;
 use craft\helpers\ArrayHelper;
+use Nette\PhpGenerator\Constant;
+use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\PsrPrinter;
+use PhpParser\Comment\Doc;
 use PhpParser\Lexer\Emulative;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\UseUse;
+use PhpParser\NodeAbstract;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor as NodeVisitorInterface;
 use PhpParser\NodeVisitor\CloningVisitor;
-use PhpParser\NodeVisitorAbstract;
-use PhpParser\ParserFactory;
+use PhpParser\Parser\Php7;
 use PhpParser\PrettyPrinter\Standard;
 use yii\base\Event;
 
@@ -44,8 +50,8 @@ class Workspace
     /**
      * Ensures a class is imported, and returns the local class name or alias for it.
      *
-     * @param string $class The class to import
-     * @return string The class name or alias that the class should be referred to by
+     * @param string $class The class to import.
+     * @return string The class name or alias that the class should be referred to by.
      */
     public function importClass(string $class): string
     {
@@ -144,10 +150,10 @@ class Workspace
     /**
      * Prepares class-level event handler code, and ensures all classes are imported.
      *
-     * @param string $class The class that triggers the event
-     * @param string $event The event constant name
-     * @param string $eventClass The event class that will be passed
-     * @param string $handlerCode The event handler code
+     * @param string $class The class that triggers the event.
+     * @param string $event The event constant name.
+     * @param string $eventClass The event class that will be passed.
+     * @param string $handlerCode The event handler code.
      * @param bool $ensureClassExists Whether the event should be wrapped in a `class_exists()` check for `$class`.
      * @return string
      */
@@ -182,9 +188,9 @@ PHP;
     /**
      * Prepares class-level event handler code for registering a component, and ensures all classes are imported.
      *
-     * @param string $class The class that triggers the registration event
-     * @param string $event The registration event constant name
-     * @param string $componentClass The component class to attach to [[RegisterComponentTypesEvent::$types]]
+     * @param string $class The class that triggers the registration event.
+     * @param string $event The registration event constant name.
+     * @param string $componentClass The component class to attach to [[RegisterComponentTypesEvent::$types]].
      * @param bool $ensureClassExists Whether the event should be wrapped in a `class_exists()` check for `$class`.
      * @return string
      */
@@ -202,13 +208,15 @@ PHP;
     }
 
     /**
-     * Modifies PHP code with a given node visitor
+     * Modifies PHP code with a given node visitor.
      *
-     * @param NodeVisitorAbstract $visitor
-     * @return bool Whether the code was modified
+     * @param NodeVisitorInterface $visitor
+     * @return bool Whether the code was modified.
      */
-    public function modifyCode(NodeVisitorAbstract $visitor): bool
+    public function modifyCode(NodeVisitorInterface $visitor): bool
     {
+        // Format-preserving pretty printing setup
+        // see https://github.com/nikic/PHP-Parser/blob/4.x/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
         $lexer = new Emulative([
             'usedAttributes' => [
                 'comments',
@@ -216,54 +224,195 @@ PHP;
                 'startTokenPos', 'endTokenPos',
             ],
         ]);
-
-        $parser = (new ParserFactory())->create(ParserFactory::ONLY_PHP7, $lexer);
-
+        $parser = new Php7($lexer);
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new CloningVisitor());
-        $traverser->addVisitor($visitor);
-
         $oldStmts = $parser->parse($this->code);
         $oldTokens = $lexer->getTokens();
         $newStmts = $traverser->traverse($oldStmts);
 
-        if (Code::printSnippet($oldStmts) === Code::printSnippet($newStmts)) {
+        // Capture the original code
+        $printer = new Standard();
+        $oldPrint = $printer->prettyPrint($newStmts);
+
+        // Now modify $newStmts
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($visitor);
+        $newStmts = $traverser->traverse($newStmts);
+
+        if ($printer->prettyPrint($newStmts) === $oldPrint) {
             // Nothing changed
             return false;
         }
 
-        $this->code = (new Standard())->printFormatPreserving($newStmts, $oldStmts, $oldTokens);
+        $this->code = $printer->printFormatPreserving($newStmts, $oldStmts, $oldTokens);
         return true;
+    }
+
+    /**
+     * Appends code to an AST node.
+     *
+     * @param string $code The code to append.
+     * @param callable $test A function that determines where to append the code.
+     * It will be passed a [[Node]], and should return `true` or `false`.
+     * @return bool Whether the code was appended.
+     */
+    private function appendCode(string|array $code, callable $test): bool
+    {
+        return $this->modifyCode(new NodeVisitor(
+            enterNode: function(Node $node) use ($code, $test): ?int {
+                if (property_exists($node, 'stmts') && $test($node)) {
+                    if ($node->stmts === null) {
+                        $node->stmts = [];
+                    }
+                    array_push($node->stmts, ...(is_array($code) ? $code : Code::parseSnippet($code)));
+                    return NodeTraverser::STOP_TRAVERSAL;
+                }
+                return null;
+            },
+        ));
+    }
+
+    /**
+     * Appends a method or code snippet to a class.
+     *
+     * @param Method|string $code The PHP code to append to the method.
+     * @return bool
+     */
+    public function appendCodeToClass(Method|string $code): bool
+    {
+        if ($code instanceof Method) {
+            $method = (new PsrPrinter())->printMethod($code);
+            $code = <<<PHP
+class Foo {
+    $method
+}
+PHP;
+            $stmts = Code::parseSnippet($code);
+            /** @var Class_ $class */
+            $class = $stmts[0];
+            $code = $class->stmts;
+        }
+
+        return $this->appendCode($code, fn(Node $n) => $this->isClass($n));
     }
 
     /**
      * Appends a code snippet to a method.
      *
-     * @param string $method The method name to modify
-     * @param string $code The PHP code to append to the method
-     * @return bool Whether the code was modified
+     * @param string $code The PHP code to append to the method.
+     * @param string $method The method name to modify.
+     * @return bool Whether the code was modified.
      */
-    public function appendToMethod(string $method, string $code): bool
+    public function appendCodeToMethod(string $code, string $method): bool
     {
-        $visitor = new class($method, Code::parseSnippet($code)) extends NodeVisitorAbstract {
-            public function __construct(
-                private string $method,
-                private array $stmts,
-            ) {
-            }
+        return $this->appendCode($code, fn(Node $n) => $this->isMethod($n, $method));
+    }
 
-            public function enterNode(Node $node): ?int
-            {
-                if (!$node instanceof ClassMethod || (string)$node->name !== $this->method) {
-                    return null;
+    /**
+     * Modifies a doc comment.
+     *
+     * @param callable $test
+     * @param callable $modify
+     * @return bool
+     */
+    private function modifyDocComment(callable $test, callable $modify): bool
+    {
+        return $this->modifyCode(new NodeVisitor(
+            enterNode: function(Node $node) use ($test, $modify): ?int {
+                if ($node instanceof NodeAbstract && $test($node)) {
+                    $comment = $node->getDocComment()?->getText() ?? '';
+                    $comment = Code::formatDocComment($modify(Code::unformatDocComment($comment)));
+                    $node->setDocComment(new Doc($comment));
+                    return NodeTraverser::STOP_TRAVERSAL;
                 }
+                return null;
+            },
+        ));
+    }
 
-                array_push($node->stmts, ...$this->stmts);
-                return NodeTraverser::STOP_TRAVERSAL;
-            }
-        };
+    /**
+     * Sets a doc comment on an AST node.
+     *
+     * @param string $comment The comment to set.
+     * @param callable $test A function that determines where to append the comment.
+     * It will be passed a [[NodeAbstract]], and should return `true` or `false`.
+     * @return bool Whether the code was appended.
+     */
+    private function setDocComment(string $comment, callable $test): bool
+    {
+        return $this->modifyDocComment($test, fn() => $comment);
+    }
 
-        return $this->modifyCode($visitor);
+    /**
+     * Appends a doc comment to an AST node.
+     *
+     * @param string $comment The comment to append.
+     * @param callable $test A function that determines where to append the comment.
+     * It will be passed a [[NodeAbstract]], and should return `true` or `false`.
+     * @return bool Whether the code was appended.
+     */
+    private function appendDocComment(string $comment, callable $test): bool
+    {
+        return $this->modifyDocComment($test, function(string $text) use ($comment) {
+            return ($text !== '' ? "$text\n" : '') . $comment;
+        });
+    }
+
+    /**
+     * Sets a doc comment on the class.
+     *
+     * @param string $comment The comment to set.
+     * @return bool
+     */
+    public function setDocCommentOnClass(string $comment): bool
+    {
+        return $this->setDocComment($comment, fn($n) => $this->isClass($n));
+    }
+
+    /**
+     * Appends a doc comment to the class.
+     *
+     * @param string $comment The comment to append.
+     * @return bool
+     */
+    public function appendDocCommentOnClass(string $comment): bool
+    {
+        return $this->appendDocComment($comment, fn($n) => $this->isClass($n));
+    }
+
+    /**
+     * Sets a doc comment on a method.
+     *
+     * @param string $comment The comment to set.
+     * @param string $method The method name.
+     * @return bool
+     */
+    public function setDocCommentOnMethod(string $comment, string $method): bool
+    {
+        return $this->setDocComment($comment, fn($n) => $this->isMethod($n, $method));
+    }
+
+    /**
+     * Appends a doc comment to a method.
+     *
+     * @param string $comment The comment to append.
+     * @param string $method The method name.
+     * @return bool
+     */
+    public function appendDocCommentOnMethod(string $comment, string $method): bool
+    {
+        return $this->appendDocComment($comment, fn($n) => $this->isMethod($n, $method));
+    }
+
+    public function isClass(Node $node): bool
+    {
+        return $node instanceof Class_;
+    }
+
+    public function isMethod(Node $node, string $method): bool
+    {
+        return $node instanceof ClassMethod && (string)$node->name === $method;
     }
 
     private function sortImports(array &$stmts): void
