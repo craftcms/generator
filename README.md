@@ -1,6 +1,7 @@
-<p align="center"><img src="./icon.svg" width="100" height="100" alt="Craft Generator icon"></p>
-
-<h1 align="center">Craft Generator</h1>
+<h1 align="center">
+  <div><img src="./icon.svg" width="100" height="100" alt="Craft Generator icon"></div>
+  Craft Generator
+</h1>
 
 Scaffold new Craft CMS plugins, modules, and system components from the CLI.
 
