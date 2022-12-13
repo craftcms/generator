@@ -53,9 +53,14 @@ php craft make element-type
 php craft make field-type
 php craft make filesystem-type
 php craft make generator
+php craft make model
 php craft make module
 php craft make plugin
 php craft make queue-job
+php craft make record
+php craft make service
+php craft make utility
+php craft make validator
 php craft make widget-type
 ```
 
