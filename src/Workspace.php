@@ -16,7 +16,11 @@ use Nette\PhpGenerator\PsrPrinter;
 use PhpParser\Comment\Doc;
 use PhpParser\Lexer\Emulative;
 use PhpParser\Node;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -29,6 +33,7 @@ use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\Parser\Php7;
 use PhpParser\PrettyPrinter\Standard;
 use yii\base\Event;
+use yii\base\InvalidArgumentException;
 
 /**
  * Works on a PHP file.
@@ -403,6 +408,54 @@ PHP;
     public function appendDocCommentOnMethod(string $comment, string $method): bool
     {
         return $this->appendDocComment($comment, fn($n) => $this->isMethod($n, $method));
+    }
+
+    /**
+     * Merges new items into an array in the AST, recursively.
+     *
+     * Integer keys in `$b` will be added to `$a->items` directly.
+     *
+     * String keys set to nested arrays will be merged recursively.
+     *
+     * @param Array_ $a The AST array to be merged to.
+     * @param array $b The array to be merged from.
+     * @throws InvalidArgumentException if `$b` contains any values which aren’t `Expr` objects or nested arrays.
+     */
+    public function mergeIntoArray(Array_ $a, array $b): void
+    {
+        foreach ($b as $k => $v) {
+            if (is_int($k)) {
+                if (!$v instanceof Expr) {
+                    throw new InvalidArgumentException('Integer keys must be set to Expr objects.');
+                }
+                $a->items[] = new ArrayItem($v);
+            } else {
+                if (!$v instanceof Expr && !is_array($v)) {
+                    throw new InvalidArgumentException('String keys must be set to ArrayItem objects or nested arrays.');
+                }
+                // Does the same key already exist?
+                /** @var ArrayItem|null $item */
+                $item = ArrayHelper::firstWhere($a->items, fn(?ArrayItem $item) => (
+                    $item &&
+                    $item->key instanceof String_ &&
+                    $item->key->value === $k
+                ));
+                if ($v instanceof Expr) {
+                    if ($item) {
+                        $item->value = $v;
+                    } else {
+                        $a->items[] = new ArrayItem($v, new String_($k));
+                    }
+                } else {
+                    if (!$item) {
+                        $item = new ArrayItem(new Array_(), new String_($k));
+                    } elseif (!$item->value instanceof Array_) {
+                        $item->value = new Array_();
+                    }
+                    self::mergeIntoArray($item->value, $v);
+                }
+            }
+        }
     }
 
     /**

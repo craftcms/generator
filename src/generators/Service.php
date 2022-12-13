@@ -15,7 +15,6 @@ use craft\helpers\ArrayHelper;
 use Nette\PhpGenerator\PhpNamespace;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
@@ -74,49 +73,23 @@ class Service extends BaseGenerator
                         if (!$workspace->isMethod($node, 'config')) {
                             return null;
                         }
-                        // See if it directly returns an array
+                        // Make sure an array is returned
                         /** @var ClassMethod $node */
                         /** @var Return_|null $returnStmt */
                         $returnStmt = ArrayHelper::firstWhere($node->stmts, fn(Stmt $stmt) => $stmt instanceof Return_);
                         if (!$returnStmt || !$returnStmt->expr instanceof Array_) {
                             return NodeTraverser::STOP_TRAVERSAL;
                         }
-                        if ($returnStmt->expr->items === null) {
-                            $returnStmt->expr->items = [];
-                        }
-                        // Does the array already have a `components` key?
-                        /** @var ArrayItem|null $componentsItem */
-                        $componentsItem = ArrayHelper::firstWhere(
-                            $returnStmt->expr->items,
-                            fn(ArrayItem $item) => $item->key instanceof String_ && $item->key->value === 'components'
-                        );
-                        if ($componentsItem) {
-                            $componentsArray = $componentsItem->value;
-                            // Make sure it's set to an array
-                            if (!$componentsArray instanceof Array_) {
-                                return NodeTraverser::STOP_TRAVERSAL;
-                            }
-                            if ($componentsArray->items === null) {
-                                $componentsArray->items = [];
-                            } else {
-                                // Make sure it doesn't already define a key of the same component ID
-                                if (ArrayHelper::contains($componentsArray->items, fn(ArrayItem $item) => (
-                                    $item->key instanceof String_ &&
-                                    $item->key->value === $this->componentId
-                                ))) {
-                                    return NodeTraverser::STOP_TRAVERSAL;
-                                }
-                            }
-                        } else {
-                            $componentsArray = new Array_();
-                            $returnStmt->expr->items[] = new ArrayItem($componentsArray, new String_('components'));
-                        }
                         if (str_contains($serviceClassName, '\\')) {
                             $value = new String_($serviceClassName);
                         } else {
                             $value = new ClassConstFetch(new Name($serviceClassName), 'class');
                         }
-                        $componentsArray->items[] = new ArrayItem($value, new String_($this->componentId));
+                        $workspace->mergeIntoArray($returnStmt->expr, [
+                            'components' => [
+                                $this->componentId => $value,
+                            ],
+                        ]);
                         return NodeTraverser::STOP_TRAVERSAL;
                     }
                 ))) {
