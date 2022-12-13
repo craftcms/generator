@@ -405,11 +405,23 @@ PHP;
         return $this->appendDocComment($comment, fn($n) => $this->isMethod($n, $method));
     }
 
+    /**
+     * Returns whether the given AST node represents a class.
+     *
+     * @param Node $node
+     * @return bool
+     */
     public function isClass(Node $node): bool
     {
         return $node instanceof Class_;
     }
 
+    /**
+     * Returns whether the given AST node represents a method with a certain name.
+     * @param Node $node
+     * @param string $method
+     * @return bool
+     */
     public function isMethod(Node $node, string $method): bool
     {
         return $node instanceof ClassMethod && (string)$node->name === $method;
