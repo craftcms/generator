@@ -134,7 +134,7 @@ class Workspace
 
             if (!$count) {
                 // No `namespace` even
-                return $class;
+                return "\\$class";
             }
         }
 
