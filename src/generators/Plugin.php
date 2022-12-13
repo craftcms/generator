@@ -115,7 +115,17 @@ class Plugin extends BaseGenerator
 
         $this->minCraftVersion = $this->command->prompt('Minimum Craft CMS version:', [
             'default' => Craft::$app->getVersion(),
-            'pattern' => '/^[\d\.]+\(-\w+(\.\d+)?)?$/',
+            'validator' => function(string $input, ?string &$error): bool {
+                if (!preg_replace('/^[\d\.]+\(-\w+(\.\d+)?)?$/', $input)) {
+                    $error = 'Invalid version.';
+                    return false;
+                }
+                if (version_compare($input, '4.3.5', '<')) {
+                    $error = 'Generated plugins must require Craft CMS 4.3.5 or later.';
+                    return false;
+                }
+                return true;
+            },
         ]);
 
         $this->className = $this->classNamePrompt('Plugin class name:', [
