@@ -59,7 +59,7 @@ class Plugin extends BaseGenerator
             'required' => true,
         ]);
 
-        $this->public = $this->command->confirm('Do you plan on making it public?', true);
+        $this->public = true;
 
         $this->handle = $this->command->prompt('Plugin handle:', [
             'default' => ($this->public ? '' : '_') . StringHelper::toKebabCase($this->name),
