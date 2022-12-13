@@ -81,10 +81,10 @@ class Service extends BaseGenerator
                         if (!$returnStmt || !$returnStmt->expr instanceof Array_) {
                             return NodeTraverser::STOP_TRAVERSAL;
                         }
-                        // Does the array already have a `components` key?
                         if ($returnStmt->expr->items === null) {
                             $returnStmt->expr->items = [];
                         }
+                        // Does the array already have a `components` key?
                         /** @var ArrayItem|null $componentsItem */
                         $componentsItem = ArrayHelper::firstWhere(
                             $returnStmt->expr->items,
@@ -96,12 +96,20 @@ class Service extends BaseGenerator
                             if (!$componentsArray instanceof Array_) {
                                 return NodeTraverser::STOP_TRAVERSAL;
                             }
+                            if ($componentsArray->items === null) {
+                                $componentsArray->items = [];
+                            } else {
+                                // Make sure it doesn't already define a key of the same component ID
+                                if (ArrayHelper::contains($componentsArray->items, fn(ArrayItem $item) => (
+                                    $item->key instanceof String_ &&
+                                    $item->key->value === $this->componentId
+                                ))) {
+                                    return NodeTraverser::STOP_TRAVERSAL;
+                                }
+                            }
                         } else {
                             $componentsArray = new Array_();
                             $returnStmt->expr->items[] = new ArrayItem($componentsArray, new String_('components'));
-                        }
-                        if ($componentsArray->items === null) {
-                            $componentsArray->items = [];
                         }
                         if (str_contains($serviceClassName, '\\')) {
                             $value = new String_($serviceClassName);
