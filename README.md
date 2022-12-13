@@ -84,3 +84,19 @@ You’ll be presented with the following prompts:
 - **Default namespace for generated [type]**: The default namespace which the generator should suggest, relative to the plugin/module’s root namespace
 
 Your generator will be created based on the provided class name and namespace, which extends [`craft\generator\BaseGenerator`](src/BaseGenerator.php).
+
+## Roadmap
+
+The following generator types are being considered for future releases:
+
+- [ ] Events
+- [ ] Exceptions
+- [ ] GraphQL arguments
+- [ ] GraphQL directives
+- [ ] GraphQL interfaces
+- [ ] GraphQL mutations
+- [ ] GraphQL queries
+- [ ] GraphQL resolvers
+- [ ] GraphQL types
+- [ ] Migrations
+- [ ] Tests
