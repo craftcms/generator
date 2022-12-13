@@ -17,7 +17,6 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Name;
-use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Return_;
@@ -80,14 +79,9 @@ class Service extends BaseGenerator
                         if (!$returnStmt || !$returnStmt->expr instanceof Array_) {
                             return NodeTraverser::STOP_TRAVERSAL;
                         }
-                        if (str_contains($serviceClassName, '\\')) {
-                            $value = new String_($serviceClassName);
-                        } else {
-                            $value = new ClassConstFetch(new Name($serviceClassName), 'class');
-                        }
                         $workspace->mergeIntoArray($returnStmt->expr, [
                             'components' => [
-                                $this->componentId => $value,
+                                $this->componentId => new ClassConstFetch(new Name($serviceClassName), 'class'),
                             ],
                         ]);
                         return NodeTraverser::STOP_TRAVERSAL;
