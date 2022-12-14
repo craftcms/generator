@@ -34,7 +34,7 @@ abstract class Composer
 
         // Make sure each of the keys ends in "\"
         return array_combine(
-            array_map(fn(string $namespace) => StringHelper::ensureRight($namespace, '\\'), array_keys($autoload)),
+            array_map(fn(string $namespace) => StringHelper::ensureRight(Code::normalizeClass($namespace), '\\'), array_keys($autoload)),
             array_values($autoload),
         );
     }

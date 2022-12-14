@@ -208,7 +208,7 @@ class Command extends Controller
                     break;
                 } elseif (FileHelper::isWithin($basePath, $rootDir)) {
                     $relativeBasePath = FileHelper::relativePath($basePath, $rootDir);
-                    $baseNamespace = sprintf('%s\\%s', $rootNamespace, Code::normalizeClass($relativeBasePath));
+                    $baseNamespace = Code::normalizeClass("$rootNamespace\\$relativeBasePath");
                     break;
                 }
             }
