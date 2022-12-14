@@ -148,7 +148,7 @@ abstract class BaseGenerator extends BaseObject
 
         if (isset($options['default'])) {
             $options['default'] = Code::normalizeClass($options['default']);
-            if ($options['ensureContained'] && !str_starts_with("{$options['default']}\\", "$this->baseNamespace\\")) {
+            if ($options['ensureContained'] && !str_starts_with("{$options['default']}\\", Code::normalizeClass($this->baseNamespace) . "\\")) {
                 throw new InvalidArgumentException("The default value must begin with the base namespace ($this->baseNamespace).");
             }
         }
