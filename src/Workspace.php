@@ -448,7 +448,7 @@ PHP;
                     }
                 } else {
                     if (!$item) {
-                        $item = new ArrayItem(new Array_(), new String_($k));
+                        $item = $a->items[] = new ArrayItem(new Array_(), new String_($k));
                     } elseif (!$item->value instanceof Array_) {
                         $item->value = new Array_();
                     }
