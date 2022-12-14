@@ -448,9 +448,9 @@ PHP;
                     }
                 } else {
                     if (!$item) {
-                        $item = $a->items[] = new ArrayItem(new Array_(), new String_($k));
+                        $item = $a->items[] = new ArrayItem(new Array_([], ['kind' => Array_::KIND_SHORT]), new String_($k));
                     } elseif (!$item->value instanceof Array_) {
-                        $item->value = new Array_();
+                        $item->value = new Array_([], ['kind' => Array_::KIND_SHORT]);
                     }
                     self::mergeIntoArray($item->value, $v);
                 }
