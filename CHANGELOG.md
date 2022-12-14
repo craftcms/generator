@@ -1,3 +1,4 @@
 # Release Notes for Craft Generator
 
-- WIP
+## 1.0.0
+- Initial release
