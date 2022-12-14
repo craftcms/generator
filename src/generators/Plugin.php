@@ -116,7 +116,7 @@ class Plugin extends BaseGenerator
         $this->minCraftVersion = $this->command->prompt('Minimum Craft CMS version:', [
             'default' => Craft::$app->getVersion(),
             'validator' => function(string $input, ?string &$error): bool {
-                if (!preg_replace('/^[\d\.]+\(-\w+(\.\d+)?)?$/', $input)) {
+                if (!preg_match('/^[\d\.]+(-\w+(\.\d+)?)?$/', $input)) {
                     $error = 'Invalid version.';
                     return false;
                 }
