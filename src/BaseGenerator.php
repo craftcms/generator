@@ -765,24 +765,48 @@ abstract class BaseGenerator extends BaseObject
         ?string &$fallbackExample = null,
         bool $ensureClassExists = false,
     ): bool {
-        return $this->modifyModuleFile(function(Workspace $workspace) use (
-            $class,
-            $event,
-            $componentClass,
-            &$fallbackExample,
-            $ensureClassExists,
-        ) {
-            $eventCode = $workspace->prepareRegistrationEventHandlerCode($class, $event, $componentClass, $ensureClassExists);
+        foreach (['attachEventHandlers', 'init'] as $method) {
+            $file = $this->findModuleMethod($method);
+            if ($file) {
+                return $this->modifyFile($file, function(Workspace $workspace) use (
+                    $class,
+                    $event,
+                    $componentClass,
+                    &$fallbackExample,
+                    $ensureClassExists,
+                    $method,
+                ) {
+                    $eventCode = $workspace->prepareRegistrationEventHandlerCode($class, $event, $componentClass, $ensureClassExists);
 
-            if (
-                !$workspace->appendCodeToMethod($eventCode, 'attachEventHandlers') &&
-                !$workspace->appendCodeToMethod($eventCode, 'init')
-            ) {
-                $fallbackExample = $workspace->printNewImports() . Code::formatSnippet($eventCode);
-                return false;
+                    if (!$workspace->appendCodeToMethod($eventCode, $method)) {
+                        $fallbackExample = $workspace->printNewImports() . Code::formatSnippet($eventCode);
+                        return false;
+                    }
+
+                    return true;
+                });
             }
+        }
+    }
 
-            return true;
-        });
+    /**
+     * Returns the file path that defines the given module method, if the method exists and is defined within
+     * the module’s base path.
+     *
+     * @param string $method
+     * @return string|false
+     * @since 1.0.2
+     */
+    protected function findModuleMethod(string $method): string|false
+    {
+        try {
+            $file = (new ReflectionMethod($this->module, $method))->getFileName();
+        } catch (ReflectionException) {
+            return false;
+        }
+        if (!FileHelper::isWithin($file, $this->module->getBasePath())) {
+            return false;
+        }
+        return $file;
     }
 }

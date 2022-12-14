@@ -8,6 +8,7 @@
 namespace craft\generator\generators;
 
 use Craft;
+use craft\base\PluginInterface;
 use craft\generator\BaseGenerator;
 use craft\generator\NodeVisitor;
 use craft\generator\Workspace;
@@ -64,36 +65,40 @@ class Service extends BaseGenerator
         $message = "**Service created!**";
         if (
             !$this->module instanceof Application &&
-            !$this->modifyModuleFile(function(Workspace $workspace) {
-                $serviceClassName = $workspace->importClass("$this->namespace\\$this->className");
+            (
+                !$this->module instanceof PluginInterface ||
+                ($file = $this->findModuleMethod('config')) === false ||
+                !$this->modifyFile($file, function(Workspace $workspace) {
+                    $serviceClassName = $workspace->importClass("$this->namespace\\$this->className");
 
-                if (!$workspace->modifyCode(new NodeVisitor(
-                    enterNode: function(Node $node) use ($workspace, $serviceClassName) {
-                        if (!$workspace->isMethod($node, 'config')) {
-                            return null;
-                        }
-                        // Make sure an array is returned
-                        /** @var ClassMethod $node */
-                        /** @var Return_|null $returnStmt */
-                        $returnStmt = ArrayHelper::firstWhere($node->stmts, fn(Stmt $stmt) => $stmt instanceof Return_);
-                        if (!$returnStmt || !$returnStmt->expr instanceof Array_) {
+                    if (!$workspace->modifyCode(new NodeVisitor(
+                        enterNode: function(Node $node) use ($workspace, $serviceClassName) {
+                            if (!$workspace->isMethod($node, 'config')) {
+                                return null;
+                            }
+                            // Make sure an array is returned
+                            /** @var ClassMethod $node */
+                            /** @var Return_|null $returnStmt */
+                            $returnStmt = ArrayHelper::firstWhere($node->stmts, fn(Stmt $stmt) => $stmt instanceof Return_);
+                            if (!$returnStmt || !$returnStmt->expr instanceof Array_) {
+                                return NodeTraverser::STOP_TRAVERSAL;
+                            }
+                            $workspace->mergeIntoArray($returnStmt->expr, [
+                                'components' => [
+                                    $this->componentId => new ClassConstFetch(new Name($serviceClassName), 'class'),
+                                ],
+                            ]);
                             return NodeTraverser::STOP_TRAVERSAL;
                         }
-                        $workspace->mergeIntoArray($returnStmt->expr, [
-                            'components' => [
-                                $this->componentId => new ClassConstFetch(new Name($serviceClassName), 'class'),
-                            ],
-                        ]);
-                        return NodeTraverser::STOP_TRAVERSAL;
+                    ))) {
+                        return false;
                     }
-                ))) {
-                    return false;
-                }
 
-                $workspace->appendDocCommentOnClass("@property-read $serviceClassName \$$this->componentId");
+                    $workspace->appendDocCommentOnClass("@property-read $serviceClassName \$$this->componentId");
 
-                return true;
-            })
+                    return true;
+                })
+            )
         ) {
             $moduleFile = $this->moduleFile();
             $message .= "\n" . <<<MD
