@@ -1,7 +1,7 @@
 # Release Notes for Craft Generator
 
 ## 1.0.2 - 2022-12-14
-- The service generator will now modify plugins’/modules’ `config()` method even if it is defined by a separate trait or base class, so long as it lives within the plugin/module root path.
+- The service generator will now modify plugins’ `config()` method even if it is defined by a separate trait or base class, so long as it lives within the plugin’s root path.
 - Added `craft\generator\BaseGenerator::findModuleMethod()`.
 - Fixed an error that occurred when generating a plugin, if a custom minimum Craft CMS version was entered. ([#1](https://github.com/craftcms/generator/issues/1))
 - Fixed an error that could occur if a plugin or module’s base namespace contained double-backslashes. ([#3](https://github.com/craftcms/generator/pull/3))
