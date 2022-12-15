@@ -49,6 +49,12 @@ class Plugin extends BaseGenerator
     private bool $addPhpStan;
     private array $craftConfig;
 
+    /**
+     * The Composer package name regex pattern.
+     * @see https://getcomposer.org/doc/04-schema.md#name
+     */
+    const PACKAGE_NAME_PATTERN = '^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]?|-{0,2})[a-z0-9]+)*$';
+
     public function run(): bool
     {
         $this->name = $this->command->prompt('Plugin name:', [
@@ -80,7 +86,7 @@ class Plugin extends BaseGenerator
         $this->packageName = $this->command->prompt('Composer package name:', [
             'required' => true,
             'default' => $defaultVendor ? "$defaultVendor/$this->handle" : null,
-            'pattern' => '/^[a-z][a-z\\-]*\\/[a-z][a-z\\-]*$/',
+            'pattern' => sprintf('/%s/', self::PACKAGE_NAME_PATTERN),
         ]);
 
         $this->description = $this->command->prompt('Plugin description:');

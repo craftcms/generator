@@ -2,6 +2,7 @@
 
 ## Unreleased
 - The module generator now suggests a default root namespace based on root location, if it’s not already autoloadable. ([#2](https://github.com/craftcms/generator/issues/2))
+- Fixed a bug where the plugin generator didn’t allow Composer package names that contained numbers. ([#4](https://github.com/craftcms/generator/issues/4)) 
 
 ## 1.0.2 - 2022-12-14
 - The service generator will now modify plugins’ `config()` method even if it is defined by a separate trait or base class, so long as it lives within the plugin’s root path.
