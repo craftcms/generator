@@ -402,9 +402,16 @@ abstract class BaseGenerator extends BaseObject
         $composerDir = dirname(FileHelper::absolutePath($this->composerFile, ds: '/'));
         $newRootPath = FileHelper::relativePath($dir, $composerDir) . '/';
 
+        if (!isset($this->baseNamespace) && !str_starts_with($newRootPath, '/')) {
+            $default = Code::normalizeClass(preg_replace('/[^\w\/]/', '', strtolower($newRootPath)));
+        } else {
+            $default = null;
+        }
+
         $newRootNamespace = $this->namespacePrompt("What should the root namespace for `$newRootPath` be?", [
             'required' => true,
             'ensureContained' => isset($this->baseNamespace),
+            'default' => $default,
         ]);
 
         $composerConfig = Json::decodeFromFile($this->composerFile);
