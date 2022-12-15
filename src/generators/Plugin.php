@@ -85,7 +85,7 @@ class Plugin extends BaseGenerator
         $defaultVendor = trim(preg_replace('/[^a-z\\-]/i', '', StringHelper::toKebabCase($this->developer)), '-');
         $this->packageName = $this->command->prompt('Composer package name:', [
             'required' => true,
-            'default' => $defaultVendor ? "$defaultVendor/$this->handle" : null,
+            'default' => $defaultVendor ? "$defaultVendor/craft-$this->handle" : null,
             'pattern' => sprintf('/%s/', self::PACKAGE_NAME_PATTERN),
         ]);
 
