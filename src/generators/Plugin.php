@@ -576,7 +576,11 @@ EOD);
 
         $class->addMethod('attachEventHandlers')
             ->setPrivate()
-            ->setReturnType('void');
+            ->setReturnType('void')
+            ->setBody(<<<EOD
+// Register event handlers here ...
+// (see https://craftcms.com/docs/4.x/extend/events.html to get started)
+EOD);
 
         $this->writePhpFile("$this->targetDir/src/$this->className.php", $file);
     }

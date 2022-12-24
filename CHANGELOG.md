@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- Plugins’ and modules’ `attachEventHandlers()` methods now include a comment pointing to the [Events documentation](https://craftcms.com/docs/4.x/extend/events.html).
+
 ## 1.0.3 - 2022-12-15
 - The plugin generator now includes `craft-` in the default suggested Composer package name. ([#5](https://github.com/craftcms/generator/issues/5))
 - The module generator now suggests a default root namespace based on root location, if it’s not already autoloadable. ([#2](https://github.com/craftcms/generator/issues/2))
