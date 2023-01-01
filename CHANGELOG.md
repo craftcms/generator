@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- Improved the web controller scaffolding.
+
 ## 1.0.4 - 2022-12-24
 - Plugins’ and modules’ `attachEventHandlers()` methods now include a comment pointing to the [Events documentation](https://craftcms.com/docs/4.x/extend/events.html).
 

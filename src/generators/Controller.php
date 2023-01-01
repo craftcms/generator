@@ -53,7 +53,7 @@ class Controller extends BaseGenerator
         $class->setComment(sprintf('%s controller', StringHelper::toTitleCase(str_replace('-', ' ', $id))));
 
         $uniqueId = $this->module instanceof Application ? $id : sprintf('%s/%s', $this->module->getUniqueId(), $id);
-        $class->addMethod('actionFooBar')
+        $class->addMethod('actionIndex')
             ->setPublic()
             ->setReturnType(Response::class)
             ->setComment("$uniqueId action")
@@ -70,6 +70,7 @@ PHP);
     private function properties(): array
     {
         return [
+            'defaultAction',
             'allowAnonymous' => new Literal('self::ALLOW_ANONYMOUS_NEVER'),
         ];
     }
