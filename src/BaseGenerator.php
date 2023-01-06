@@ -794,6 +794,8 @@ abstract class BaseGenerator extends BaseObject
                 });
             }
         }
+
+        return false;
     }
 
     /**

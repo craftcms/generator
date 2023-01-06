@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Improved the web controller scaffolding.
+- Fixed an error that could occur when generating a component for a plugin or module, if the plugin/module class didn’t have an `init()` or `attachEventHandlers()` method.
 
 ## 1.0.4 - 2022-12-24
 - Plugins’ and modules’ `attachEventHandlers()` methods now include a comment pointing to the [Events documentation](https://craftcms.com/docs/4.x/extend/events.html).
