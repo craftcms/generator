@@ -57,16 +57,5 @@
       "craftcms/plugin-installer": true,
       "pestphp/pest-plugin": true
     }
-  },
-  "repositories": [
-    {
-      "type": "path",
-      "url": "../cms",
-      "options": {
-        "versions": {
-          "craftcms/cms": "4.3.5"
-        }
-      }
-    }
-  ]
+  }
 }
