@@ -452,6 +452,7 @@ PHP;
                     } elseif (!$item->value instanceof Array_) {
                         $item->value = new Array_([], ['kind' => Array_::KIND_SHORT]);
                     }
+                    /** @phpstan-ignore-next-line */
                     self::mergeIntoArray($item->value, $v);
                 }
             }
