@@ -55,7 +55,7 @@ class FilesystemType extends BaseGenerator
 
         $message = "**Filesystem type created!**";
         if (
-            !$this->module instanceof Application &&
+            $this->isForModule() &&
             !$this->addRegistrationEventHandlerCode(
                 FsService::class,
                 'EVENT_REGISTER_FILESYSTEM_TYPES',

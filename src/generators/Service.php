@@ -64,7 +64,7 @@ class Service extends BaseGenerator
 
         $message = "**Service created!**";
         if (
-            !$this->module instanceof Application &&
+            $this->isForModule() &&
             (
                 !$this->module instanceof PluginInterface ||
                 ($file = $this->findModuleMethod('config')) === false ||

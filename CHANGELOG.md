@@ -1,6 +1,7 @@
 # Release Notes for Craft Generator
 
 ## Unreleased
+- Added support for generating components within arbitrary source paths, via a new `--path` option. 
 - Improved the web controller scaffolding.
 - Fixed an error that could occur when generating a component for a plugin or module, if the plugin/module class didn’t have an `init()` or `attachEventHandlers()` method.
 

@@ -53,7 +53,7 @@ class WidgetType extends BaseGenerator
 
         $message = "**Widget type created!**";
         if (
-            !$this->module instanceof Application &&
+            $this->isForModule() &&
             !$this->addRegistrationEventHandlerCode(
                 Dashboard::class,
                 'EVENT_REGISTER_WIDGET_TYPES',

@@ -44,7 +44,7 @@ class Record extends BaseGenerator
             'required' => true,
             'pattern' => '/^\w+$/',
             'default' => sprintf('%s%s',
-                $this->module instanceof Application ? '' : "{$this->module->id}_",
+                $this->isForModule() ? "{$this->module->id}_" : '',
                 strtolower(Inflector::pluralize($this->className)
             )),
         ]);

@@ -64,14 +64,19 @@ class Command extends Controller
     private bool $_app = false;
 
     /**
-     * @var string|null $module The module ID to generate the component for.
+     * @var string|null The module ID to generate the component for.
      */
     private ?string $_module = null;
 
     /**
-     * @var string|null $plugin The plugin handle to generate the component for.
+     * @var string|null The plugin handle to generate the component for.
      */
     private ?string $_plugin = null;
+
+    /**
+     * @var string|null The base path to generate the component in.
+     */
+    private ?string $_path = null;
 
     /**
      * @inheritdoc
@@ -95,6 +100,11 @@ class Command extends Controller
                 'default' => false,
                 'comment' => 'Generate the component for Craft CMS itself.',
             ],
+            'path' => [
+                'type' => 'string|null',
+                'default' => null,
+                'comment' => 'The base source path to generate the component in',
+            ],
             'module' => [
                 'type' => 'string|null',
                 'default' => null,
@@ -116,6 +126,7 @@ class Command extends Controller
         $this->_app = (bool)(ArrayHelper::remove($params, 'app') ?? false);
         $this->_module = ArrayHelper::remove($params, 'module');
         $this->_plugin = ArrayHelper::remove($params, 'plugin');
+        $this->_path = ArrayHelper::remove($params, 'path');
 
         return parent::runAction($id, $params);
     }
@@ -148,8 +159,11 @@ class Command extends Controller
             $this->_app ? '--app' : null,
             $this->_module ? '--module' : null,
             $this->_plugin ? '--plugin' : null,
+            $this->_path ? '--path' : null,
         ]);
         $usedParamCount = count($usedParams);
+
+        $module = null;
 
         if (in_array($type, ['module', 'plugin'])) {
             if ($usedParamCount !== 0) {
@@ -157,38 +171,42 @@ class Command extends Controller
                 return ExitCode::UNSPECIFIED_ERROR;
             }
 
-            $module = null;
             $basePath = FileHelper::normalizePath(Craft::getAlias('@root'), '/');
             $composerFile = FileHelper::normalizePath(Craft::$app->getComposer()->getJsonPath(), '/');
             $baseNamespace = null;
         } else {
             if ($usedParamCount === 0) {
-                $this->stdout("`make $type` must specify an --app, --module, or --plugin option.\n", Console::FG_RED);
+                $this->stdout("`make $type` must specify an --plugin, --module, --app, or --path option.\n", Console::FG_RED);
                 return ExitCode::UNSPECIFIED_ERROR;
             } elseif ($usedParamCount !== 1) {
-                $this->stdout("`make $type` must only specify --app, --module, or --plugin, but not multiple.\n", Console::FG_RED);
+                $this->stdout("`make $type` must only specify --plugin, --module, --app, or --path, but not multiple.\n", Console::FG_RED);
                 return ExitCode::UNSPECIFIED_ERROR;
             }
 
-            if ($this->_app) {
-                $module = Craft::$app;
-            } elseif ($this->_module) {
-                $module = Craft::$app->getModule($this->_module);
-                if (!$module) {
-                    $this->stdout("No module exists with the ID \"$this->_module\". ", Console::FG_RED);
-                    return ExitCode::UNSPECIFIED_ERROR;
-                }
+            if ($this->_path) {
+                $basePath = FileHelper::absolutePath($this->_path, ds: '/');
             } else {
-                $pluginsService = Craft::$app->getPlugins();
-                try {
-                    $module = $pluginsService->getPlugin($this->_plugin) ?? $pluginsService->createPlugin($this->_plugin);
-                } catch (InvalidPluginException $e) {
-                    $this->stdout($e->getMessage(), Console::FG_RED);
-                    return ExitCode::UNSPECIFIED_ERROR;
+                if ($this->_app) {
+                    $module = Craft::$app;
+                } elseif ($this->_module) {
+                    $module = Craft::$app->getModule($this->_module);
+                    if (!$module) {
+                        $this->stdout("No module exists with the ID \"$this->_module\". ", Console::FG_RED);
+                        return ExitCode::UNSPECIFIED_ERROR;
+                    }
+                } else {
+                    $pluginsService = Craft::$app->getPlugins();
+                    try {
+                        $module = $pluginsService->getPlugin($this->_plugin) ?? $pluginsService->createPlugin($this->_plugin);
+                    } catch (InvalidPluginException $e) {
+                        $this->stdout($e->getMessage(), Console::FG_RED);
+                        return ExitCode::UNSPECIFIED_ERROR;
+                    }
                 }
+
+                $basePath = FileHelper::normalizePath($module->getBasePath(), '/');
             }
 
-            $basePath = FileHelper::normalizePath($module->getBasePath(), '/');
             $composerFile = FileHelper::normalizePath(FileHelper::findClosestFile($basePath, [
                 'only' => ['composer.json'],
             ]), '/');

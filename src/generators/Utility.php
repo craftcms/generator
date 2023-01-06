@@ -55,7 +55,7 @@ class Utility extends BaseGenerator
 
         $message = "**Utility created!**";
         if (
-            !$this->module instanceof Application &&
+            $this->isForModule() &&
             !$this->addRegistrationEventHandlerCode(
                 Utilities::class,
                 'EVENT_REGISTER_UTILITY_TYPES',

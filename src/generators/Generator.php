@@ -133,7 +133,7 @@ PHP);
 
         $message = "**$this->ucfirstDisplayName generator created!**";
         if (
-            !$this->module instanceof Application &&
+            $this->isForModule() &&
             !$this->addRegistrationEventHandlerCode(
                 CommandCommand::class,
                 'EVENT_REGISTER_GENERATOR_TYPES',

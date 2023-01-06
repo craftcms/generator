@@ -78,7 +78,7 @@ class ElementType extends BaseGenerator
         $this->writeIndexTemplate();
 
         $message = '**Element type created!**';
-        if (!$this->module instanceof Application) {
+        if ($this->isForModule()) {
             $moduleFile = $this->moduleFile();
 
             if (!$this->addRegistrationEventHandlerCode(

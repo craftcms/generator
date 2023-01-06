@@ -29,6 +29,7 @@ use ReflectionProperty;
 use yii\base\Application;
 use yii\base\BaseObject;
 use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\base\Module;
 use yii\base\NotSupportedException;
 
@@ -109,12 +110,28 @@ abstract class BaseGenerator extends BaseObject
     abstract public function run(): bool;
 
     /**
+     * Returns whether the generator is being run for a plugin or module.
+     *
+     * @return bool
+     * @since 1.1.0
+     */
+    protected function isForModule(): bool
+    {
+        return $this->module && !$this->module instanceof Application;
+    }
+
+    /**
      * Returns the module’s file path.
      *
      * @return string
+     * @throws InvalidConfigException if no [[module]] is set
      */
     protected function moduleFile(): string
     {
+        if (!$this->module) {
+            throw new InvalidConfigException('No module is set for the generator.');
+        }
+
         return (new ReflectionClass($this->module))->getFileName();
     }
 
@@ -751,6 +768,10 @@ abstract class BaseGenerator extends BaseObject
      */
     protected function modifyModuleFile(callable $callback): bool
     {
+        if (!$this->module) {
+            return false;
+        }
+
         return $this->modifyFile($this->moduleFile(), $callback);
     }
 
@@ -808,14 +829,20 @@ abstract class BaseGenerator extends BaseObject
      */
     protected function findModuleMethod(string $method): string|false
     {
+        if (!$this->module) {
+            return false;
+        }
+
         try {
             $file = (new ReflectionMethod($this->module, $method))->getFileName();
         } catch (ReflectionException) {
             return false;
         }
+
         if (!FileHelper::isWithin($file, $this->module->getBasePath())) {
             return false;
         }
+
         return $file;
     }
 }
