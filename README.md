@@ -59,6 +59,7 @@ php craft make plugin
 php craft make queue-job
 php craft make record
 php craft make service
+php craft make twig-extension
 php craft make utility
 php craft make validator
 php craft make widget-type
