@@ -165,7 +165,7 @@ EOD);
         return [
             'init' => <<<PHP
 // Set the controllerNamespace based on whether this is a console or web request
-if (Craft::\$app->getRequest()->getIsConsoleRequest()) {
+if (Craft::\$app->request->isConsoleRequest) {
     \$this->controllerNamespace = '$slashedRootNamespace\\\\console\\\\controllers';
 } else {
     \$this->controllerNamespace = '$slashedRootNamespace\\\\controllers';
