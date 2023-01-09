@@ -26,7 +26,6 @@ use craft\services\Fields;
 use Nette\PhpGenerator\PhpNamespace;
 use yii\db\Schema;
 use yii\helpers\Inflector;
-use yii\web\Application;
 
 /**
  * Creates a new field type.

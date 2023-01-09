@@ -24,7 +24,6 @@ use PhpParser\Node\Stmt\Return_;
 use PhpParser\NodeTraverser;
 use yii\base\Component;
 use yii\helpers\Inflector;
-use yii\web\Application;
 
 /**
  * Creates a new service.

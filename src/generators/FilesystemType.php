@@ -14,7 +14,6 @@ use craft\models\FsListing;
 use craft\services\Fs as FsService;
 use Nette\PhpGenerator\PhpNamespace;
 use yii\helpers\Inflector;
-use yii\web\Application;
 
 /**
  * Creates a new filesystem type.

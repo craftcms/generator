@@ -13,7 +13,6 @@ use craft\db\SoftDeleteTrait;
 use craft\generator\BaseGenerator;
 use craft\helpers\StringHelper;
 use Nette\PhpGenerator\PhpNamespace;
-use yii\base\Application;
 use yii\helpers\Inflector;
 
 /**

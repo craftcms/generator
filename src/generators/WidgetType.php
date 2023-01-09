@@ -13,7 +13,6 @@ use craft\generator\BaseGenerator;
 use craft\services\Dashboard;
 use Nette\PhpGenerator\PhpNamespace;
 use yii\helpers\Inflector;
-use yii\web\Application;
 
 /**
  * Creates a new widget type.

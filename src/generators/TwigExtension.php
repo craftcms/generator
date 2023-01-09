@@ -3,16 +3,14 @@
 namespace craft\generator\generators;
 
 use Craft;
+use craft\generator\BaseGenerator;
 use craft\generator\helpers\Code;
 use craft\generator\Workspace;
-use craft\services\Utilities;
 use Nette\PhpGenerator\PhpNamespace;
 use Twig\Extension\AbstractExtension;
-use craft\generator\BaseGenerator;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\TwigTest;
-use yii\helpers\Inflector;
 
 /**
  * Creates a new Twig extension.

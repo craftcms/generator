@@ -13,7 +13,6 @@ use craft\generator\BaseGenerator;
 use craft\generator\Command as CommandCommand;
 use craft\generator\helpers\Code;
 use Nette\PhpGenerator\PhpNamespace;
-use yii\base\Application;
 use yii\helpers\Inflector;
 
 /**

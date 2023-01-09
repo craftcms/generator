@@ -25,7 +25,6 @@ use craft\web\CpScreenResponseBehavior;
 use craft\web\UrlManager;
 use Nette\PhpGenerator\PhpNamespace;
 use yii\helpers\Inflector;
-use yii\web\Application;
 use yii\web\Response;
 
 /**
