@@ -197,6 +197,8 @@ PHP;
      * @param string $event The registration event constant name.
      * @param string $componentClass The component class to attach to [[RegisterComponentTypesEvent::$types]].
      * @param bool $ensureClassExists Whether the event should be wrapped in a `class_exists()` check for `$class`.
+     * @param string $eventClass The event class that will be passed.
+     * @param string $eventProperty The property to register the component to.
      * @return string
      */
     public function prepareRegistrationEventHandlerCode(
@@ -204,12 +206,14 @@ PHP;
         string $event,
         string $componentClass,
         bool $ensureClassExists = false,
+        string $eventClass = RegisterComponentTypesEvent::class,
+        string $eventProperty = 'types',
     ): string {
         $componentClassName = $this->importClass($componentClass);
         $handlerCode = <<<PHP
-\$event->types[] = $componentClassName::class;
+\$event->{$eventProperty}[] = $componentClassName::class;
 PHP;
-        return $this->prepareEventHandlerCode($class, $event, RegisterComponentTypesEvent::class, $handlerCode, $ensureClassExists);
+        return $this->prepareEventHandlerCode($class, $event, $eventClass, $handlerCode, $ensureClassExists);
     }
 
     /**

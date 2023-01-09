@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- Added the GraphQL directive generator (`gql-directive`).
+
 ## 1.1.0 - 2023-01-06
 - Added the Twig Extension generator (`twig-extension`). ([#8](https://github.com/craftcms/generator/discussions/8))
 - Added support for generating components within arbitrary source paths, via a new `--path` option. 

@@ -783,6 +783,8 @@ abstract class BaseGenerator extends BaseObject
      * @param string $componentClass The component class to attach to [[RegisterComponentTypesEvent::$types]]
      * @param string|null $fallbackExample Example code that can be output if unsuccessful
      * @param bool $ensureClassExists Whether the event should be wrapped in a `class_exists()` check for `$class`.
+     * @param string $eventClass The event class that will be passed.
+     * @param string $eventProperty The property to register the component to.
      * @return bool Whether an `attachEventHandlers()` method could be found.
      * @see https://github.com/nikic/PHP-Parser/blob/4.x/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
      */
@@ -792,6 +794,8 @@ abstract class BaseGenerator extends BaseObject
         string $componentClass,
         ?string &$fallbackExample = null,
         bool $ensureClassExists = false,
+        string $eventClass = RegisterComponentTypesEvent::class,
+        string $eventProperty = 'types',
     ): bool {
         foreach (['attachEventHandlers', 'init'] as $method) {
             $file = $this->findModuleMethod($method);
@@ -803,8 +807,10 @@ abstract class BaseGenerator extends BaseObject
                     &$fallbackExample,
                     $ensureClassExists,
                     $method,
+                    $eventClass,
+                    $eventProperty,
                 ) {
-                    $eventCode = $workspace->prepareRegistrationEventHandlerCode($class, $event, $componentClass, $ensureClassExists);
+                    $eventCode = $workspace->prepareRegistrationEventHandlerCode($class, $event, $componentClass, $ensureClassExists, $eventClass, $eventProperty);
 
                     if (!$workspace->appendCodeToMethod($eventCode, $method)) {
                         $fallbackExample = $workspace->printNewImports() . Code::formatSnippet($eventCode);
