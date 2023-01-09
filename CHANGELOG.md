@@ -1,7 +1,7 @@
 # Release Notes for Craft Generator
 
 ## 1.1.0 - 2023-01-06
-- Added the Twig Extension generator (`twig-extension'). ([#8](https://github.com/craftcms/generator/discussions/8))
+- Added the Twig Extension generator (`twig-extension`). ([#8](https://github.com/craftcms/generator/discussions/8))
 - Added support for generating components within arbitrary source paths, via a new `--path` option. 
 - Improved the web controller scaffolding.
 - Fixed an error that could occur when generating a component for a plugin or module, if the plugin/module class didn’t have an `init()` or `attachEventHandlers()` method.
