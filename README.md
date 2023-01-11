@@ -53,6 +53,7 @@ php craft make element-type
 php craft make field-type
 php craft make filesystem-type
 php craft make generator
+php craft make gql-directive
 php craft make model
 php craft make module
 php craft make plugin
@@ -101,7 +102,7 @@ The following generator types are being considered for future releases:
 - [ ] Events
 - [ ] Exceptions
 - [ ] GraphQL arguments
-- [ ] GraphQL directives
+- [x] GraphQL directives
 - [ ] GraphQL interfaces
 - [ ] GraphQL mutations
 - [ ] GraphQL queries

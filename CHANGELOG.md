@@ -1,6 +1,6 @@
 # Release Notes for Craft Generator
 
-## Unreleased
+## 1.2.0 - 2023-01-11
 - Added the GraphQL directive generator (`gql-directive`).
 - Fixed a bug where plugins’ `composer.json` would include invalid `require-dev` dependencies if ECS or PHPStan weren’t used. ([#9](https://github.com/craftcms/generator/issues/9))
 
