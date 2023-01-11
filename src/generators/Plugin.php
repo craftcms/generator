@@ -466,10 +466,10 @@ MD;
                 'php' => ">=$this->minPhpVersion",
                 'craftcms/cms' => "^$this->minCraftVersion",
             ],
-            'require-dev' => [
+            'require-dev' => array_filter([
                 'craftcms/ecs' => $this->addEcs ? 'dev-main' : null,
                 'craftcms/phpstan' => $this->addPhpStan ? 'dev-main' : null,
-            ],
+            ]),
             'autoload' => [
                 'psr-4' => [
                     "$this->rootNamespace\\" => 'src/',
