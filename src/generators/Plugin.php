@@ -507,8 +507,8 @@ MD;
 
 declare(strict_types=1);
 
-use craft\ecs\SetList;
-use Symplify\EasyCodingStandard\Config\ECSConfig;
+use craft\\ecs\\SetList;
+use Symplify\\EasyCodingStandard\\Config\\ECSConfig;
 
 return static function(ECSConfig \$ecsConfig): void {
     \$ecsConfig->paths([
