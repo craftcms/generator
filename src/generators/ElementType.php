@@ -147,6 +147,11 @@ MD;
         ]);
         $namespace->add($class);
 
+        // Add generated Condition and Query classes:
+        $namespace
+            ->addUse(sprintf('%s\\%s', $this->conditionNamespace, $this->conditionName))
+            ->addUse(sprintf('%s\\%s', $this->queryNamespace, $this->queryName));
+
         $class->setComment(sprintf('%s element type', StringHelper::toTitleCase($this->displayName)));
 
         $this->writePhpClass($namespace);
