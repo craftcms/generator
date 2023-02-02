@@ -1,6 +1,6 @@
 # Release Notes for Craft Generator
 
-## Unreleased
+## 1.2.1 - 2023-02-02
 - Fixed a bug where element condition and query classes weren’t getting imported for the element class. ([#13](https://github.com/craftcms/generator/pull/13))
 - Fixed a bug where `ecs.php` class imports were missing characters. ([#13](https://github.com/craftcms/generator/pull/13))
 
