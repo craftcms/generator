@@ -140,17 +140,14 @@ MD;
             ->addUse(ElementQueryInterface::class)
             ->addUse(Response::class)
             ->addUse(UrlHelper::class)
-            ->addUse(User::class);
+            ->addUse(User::class)
+            ->addUse(sprintf('%s\\%s', $this->conditionNamespace, $this->conditionName))
+            ->addUse(sprintf('%s\\%s', $this->queryNamespace, $this->queryName));
 
         $class = $this->createClass($this->className, BaseElement::class, [
             self::CLASS_METHODS => $this->elementClassMethods(),
         ]);
         $namespace->add($class);
-
-        // Add generated Condition and Query classes:
-        $namespace
-            ->addUse(sprintf('%s\\%s', $this->conditionNamespace, $this->conditionName))
-            ->addUse(sprintf('%s\\%s', $this->queryNamespace, $this->queryName));
 
         $class->setComment(sprintf('%s element type', StringHelper::toTitleCase($this->displayName)));
 
