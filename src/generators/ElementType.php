@@ -140,7 +140,9 @@ MD;
             ->addUse(ElementQueryInterface::class)
             ->addUse(Response::class)
             ->addUse(UrlHelper::class)
-            ->addUse(User::class);
+            ->addUse(User::class)
+            ->addUse(sprintf('%s\\%s', $this->conditionNamespace, $this->conditionName))
+            ->addUse(sprintf('%s\\%s', $this->queryNamespace, $this->queryName));
 
         $class = $this->createClass($this->className, BaseElement::class, [
             self::CLASS_METHODS => $this->elementClassMethods(),
@@ -292,7 +294,7 @@ return \$user->can('delete$this->pluralName');
 PHP,
             'canCreateDrafts' => 'return true;',
             'cpEditUrl' => "return sprintf('$this->pluralKebabCasedName/%s', \$this->getCanonicalId());",
-            'getPostEditUrl' => "UrlHelper::cpUrl('$this->pluralKebabCasedName');",
+            'getPostEditUrl' => "return UrlHelper::cpUrl('$this->pluralKebabCasedName');",
             'prepareEditScreen' => <<<PHP
 /** @var Response|CpScreenResponseBehavior \$response */
 \$response->crumbs([

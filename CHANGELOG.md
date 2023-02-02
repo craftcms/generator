@@ -1,5 +1,9 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- Fixed a bug where element condition and query classes weren’t getting imported for the element class. ([#13](https://github.com/craftcms/generator/pull/13))
+- Fixed a bug where `ecs.php` class imports were missing characters. ([#13](https://github.com/craftcms/generator/pull/13))
+
 ## 1.2.0 - 2023-01-11
 - Added the GraphQL directive generator (`gql-directive`).
 - Fixed a bug where plugins’ `composer.json` would include invalid `require-dev` dependencies if ECS or PHPStan weren’t used. ([#9](https://github.com/craftcms/generator/issues/9))
