@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## 1.2.2 - 2023-02-03
+- Fixed a bug where generated modules weren’t defining a root alias for themselves, leading to an exception getting thrown when running Craft’s `help` command. ([#11](https://github.com/craftcms/generator/issues/11)) 
+
 ## 1.2.1 - 2023-02-02
 - Fixed a bug where element condition and query classes weren’t getting imported for the element class. ([#13](https://github.com/craftcms/generator/pull/13))
 - Fixed a bug where `ecs.php` class imports were missing characters. ([#13](https://github.com/craftcms/generator/pull/13))

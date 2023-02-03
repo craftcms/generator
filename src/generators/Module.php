@@ -161,9 +161,12 @@ EOD);
 
     private function methods(): array
     {
+        $rootAlias = sprintf('@%s', str_replace('\\', '/', $this->rootNamespace));
         $slashedRootNamespace = addslashes($this->rootNamespace);
         return [
             'init' => <<<PHP
+Craft::setAlias('$rootAlias', __DIR__);
+
 // Set the controllerNamespace based on whether this is a console or web request
 if (Craft::\$app->request->isConsoleRequest) {
     \$this->controllerNamespace = '$slashedRootNamespace\\\\console\\\\controllers';
