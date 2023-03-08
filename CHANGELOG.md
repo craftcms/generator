@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## 1.3.0 - 2023-03-08
+- Added support for generating private plugins (requires Craft 4.4.0-beta.1 or later).
+
 ## 1.2.2 - 2023-02-03
 - Fixed a bug where generated modules weren’t defining a root alias for themselves, leading to an exception getting thrown when running Craft’s `help` command. ([#11](https://github.com/craftcms/generator/issues/11)) 
 

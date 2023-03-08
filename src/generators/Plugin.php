@@ -8,6 +8,7 @@
 namespace craft\generator\generators;
 
 use Composer\Json\JsonManipulator;
+use Composer\Semver\Comparator;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
@@ -29,7 +30,7 @@ class Plugin extends BaseGenerator
 {
     private string $name;
     private string $developer;
-    private bool $public;
+    private bool $private;
     private string $targetDir;
     private string $relativeTargetDir;
     private string $handle;
@@ -65,19 +66,32 @@ class Plugin extends BaseGenerator
             'required' => true,
         ]);
 
-        $this->public = true;
+        $craftVersion = Craft::$app->getVersion();
+        $minPrivatePluginVersion = '4.4.0-beta.1';
+
+        if (Comparator::greaterThanOrEqualTo($craftVersion, $minPrivatePluginVersion)) {
+            $this->command->stdout(PHP_EOL);
+            $this->private = $this->command->confirm($this->command->markdownToAnsi(<<<EOD
+**Private plugin?**
+*Private plugins don’t have license verification, and can’t be published to the Plugin Store.*
+Make this a private plugin?
+EOD));
+            $this->command->stdout(PHP_EOL);
+        } else {
+            $this->private = false;
+        }
 
         $this->handle = $this->command->prompt('Plugin handle:', [
-            'default' => ($this->public ? '' : '_') . StringHelper::toKebabCase($this->name),
+            'default' => ($this->private ? '_' : '') . StringHelper::toKebabCase($this->name),
             'pattern' => sprintf('/^\_?%s$/', self::ID_PATTERN),
         ]);
 
-        if (!$this->public) {
+        if ($this->private) {
             $this->handle = StringHelper::ensureLeft($this->handle, '_');
         }
 
         $this->targetDir = $this->directoryPrompt('Plugin location:', [
-            'default' => sprintf('@root/plugins/%s', StringHelper::removeLeft($this->handle, '_')),
+            'default' => sprintf('@root/plugins/%s', ltrim($this->handle, '_')),
             'ensureEmpty' => true,
         ]);
         $this->relativeTargetDir = FileHelper::relativePath($this->targetDir);
@@ -85,13 +99,13 @@ class Plugin extends BaseGenerator
         $defaultVendor = trim(preg_replace('/[^a-z\\-]/i', '', StringHelper::toKebabCase($this->developer)), '-');
         $this->packageName = $this->command->prompt('Composer package name:', [
             'required' => true,
-            'default' => $defaultVendor ? "$defaultVendor/craft-$this->handle" : null,
+            'default' => $defaultVendor ? sprintf('%s/craft-%s', $defaultVendor, ltrim($this->handle, '_')) : null,
             'pattern' => sprintf('/%s/', self::PACKAGE_NAME_PATTERN),
         ]);
 
         $this->description = $this->command->prompt('Plugin description:');
 
-        if ($this->public) {
+        if (!$this->private) {
             $this->license = $this->command->select('How should the plugin be licensed?', [
                 'mit' => 'MIT',
                 'craft' => 'Craft (proprietary)',
@@ -120,14 +134,15 @@ class Plugin extends BaseGenerator
         ]);
 
         $this->minCraftVersion = $this->command->prompt('Minimum Craft CMS version:', [
-            'default' => Craft::$app->getVersion(),
+            'default' => $craftVersion,
             'validator' => function(string $input, ?string &$error): bool {
                 if (!preg_match('/^[\d\.]+(-\w+(\.\d+)?)?$/', $input)) {
                     $error = 'Invalid version.';
                     return false;
                 }
-                if (version_compare($input, '4.3.5', '<')) {
-                    $error = 'Generated plugins must require Craft CMS 4.3.5 or later.';
+                $minAllowedVersion = $this->private ? $minAllowedVersion : '4.3.5';
+                if (Comparator::lessThan($input, $minAllowedVersion)) {
+                    $error = sprintf('%s plugins must require Craft CMS %s or later.', $this->private ? 'Private' : 'Generated', $minAllowedVersion);
                     return false;
                 }
                 return true;
@@ -161,7 +176,7 @@ class Plugin extends BaseGenerator
         $this->writeGitIgnore();
 
         // Human info files
-        if ($this->public) {
+        if (!$this->private) {
             $this->writeChangelog();
             $this->writeLicense();
         }
@@ -417,7 +432,7 @@ This plugin requires Craft CMS $this->minCraftVersion or later, and PHP $this->m
 
 MD;
 
-        if ($this->public) {
+        if (!$this->private) {
             $contents .= <<<MD
 ## Installation
 
@@ -454,8 +469,8 @@ MD;
             'name' => $this->packageName,
             'description' => $this->description,
             'type' => 'craft-plugin',
-            'license' => $this->public ? ($this->license === 'mit' ? 'mit' : 'proprietary') : null,
-            'support' => $this->public ? array_filter([
+            'license' => !$this->private ? ($this->license === 'mit' ? 'mit' : 'proprietary') : null,
+            'support' => !$this->private ? array_filter([
                 'email' => $this->email,
                 'issues' => $this->repo ? "$this->repo/issues?state=open" : null,
                 'source' => $this->repo,
@@ -479,7 +494,7 @@ MD;
                 'handle' => $this->handle,
                 'name' => $this->name,
                 'developer' => $this->developer,
-                'documentationUrl' => $this->public ? $this->repo : '',
+                'documentationUrl' => !$this->private ? $this->repo : '',
                 'class' => $this->className !== 'Plugin' ? "$this->rootNamespace\\$this->className" : false,
             ], fn($v) => $v !== false),
             'scripts' => array_filter([
@@ -568,7 +583,7 @@ EOD);
             $class->addComment("@method $this->settingsClassName getSettings()");
         }
 
-        if ($this->public) {
+        if (!$this->private) {
             $class->addComment(sprintf('@author %s%s', $this->developer, ($this->email ? " <$this->email>" : '')));
             $class->addComment("@copyright $this->developer");
             $class->addComment(sprintf('@license %s', $this->license === 'mit' ? 'MIT' : 'https://craftcms.github.io/license/ Craft License'));
