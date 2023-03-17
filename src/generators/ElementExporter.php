@@ -65,7 +65,7 @@ MD);
             'export' => <<<PHP
 \$data = [];
 
-foreaech (\$query->all() as \$element) {
+foreach (\$query->all() as \$element) {
     // ...
 } 
 
