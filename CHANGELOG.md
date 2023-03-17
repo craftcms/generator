@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## 1.3.1 - 2023-03-17
+- Fixed a bug where generated elements had a PHP syntax error. ([#15](https://github.com/craftcms/generator/pull/15))
+
 ## 1.3.0 - 2023-03-08
 - Added support for generating private plugins (requires Craft 4.4.0-beta.1 or later).
 
