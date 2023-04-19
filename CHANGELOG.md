@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- Generated plugins now include a “Create Release” GitHub action, which will create a new GitHub Release whenever the Craft Plugin Store is notified of a new version tag.
+
 ## 1.3.1 - 2023-03-17
 - Fixed a bug where generated elements had a PHP syntax error. ([#15](https://github.com/craftcms/generator/pull/15))
 

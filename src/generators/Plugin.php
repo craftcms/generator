@@ -171,6 +171,11 @@ EOD));
             $this->command->createDirectory($this->targetDir);
         }
 
+        // Create Release action
+        if (!$this->private) {
+            $this->writeCreateReleaseAction();
+        }
+
         // Git config
         $this->writeGitAttributes();
         $this->writeGitIgnore();
@@ -288,6 +293,42 @@ $installCommands
 MD;
         $this->command->success($message);
         return true;
+    }
+
+    private function writeCreateReleaseAction(): void
+    {
+        $contents = <<<YAML
+# Creates a new GitHub Release whenever the Craft Plugin Store
+# is notified of a new version tag.
+
+name: Create Release
+run-name: Create release for \${{ github.event.client_payload.version }}
+
+on:
+  repository_dispatch:
+    types:
+      - craftcms/new-release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: ncipollo/release-action@v1
+        with:
+          body: \${{ github.event.client_payload.notes }}
+          makeLatest: \${{ github.event.client_payload.latest }}
+          name: \${{ github.event.client_payload.version }}
+          prerelease: \${{ github.event.client_payload.prerelease }}
+          tag: \${{ github.event.client_payload.tag }}
+
+YAML;
+
+        $this->command->writeToFile(
+            "$this->targetDir/.github/workflows/create-release.yml",
+            $contents
+        );
     }
 
     private function writeGitAttributes(): void
