@@ -1,6 +1,6 @@
 # Release Notes for Craft Generator
 
-## Unreleased
+## 1.4.0 - 2023-04-19
 - Generated plugins now include a “Create Release” GitHub action, which will create a new GitHub Release whenever the Craft Plugin Store is notified of a new version tag.
 - Fixed a PHP error that occurred when generating a private plugin, if a different minimum Craft version was entered.
 
