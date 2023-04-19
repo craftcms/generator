@@ -135,12 +135,12 @@ EOD));
 
         $this->minCraftVersion = $this->command->prompt('Minimum Craft CMS version:', [
             'default' => $craftVersion,
-            'validator' => function(string $input, ?string &$error): bool {
+            'validator' => function(string $input, ?string &$error) use ($minPrivatePluginVersion): bool {
                 if (!preg_match('/^[\d\.]+(-\w+(\.\d+)?)?$/', $input)) {
                     $error = 'Invalid version.';
                     return false;
                 }
-                $minAllowedVersion = $this->private ? $minAllowedVersion : '4.3.5';
+                $minAllowedVersion = $this->private ? $minPrivatePluginVersion : '4.3.5';
                 if (Comparator::lessThan($input, $minAllowedVersion)) {
                     $error = sprintf('%s plugins must require Craft CMS %s or later.', $this->private ? 'Private' : 'Generated', $minAllowedVersion);
                     return false;
