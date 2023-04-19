@@ -176,6 +176,9 @@ EOD));
             $this->writeCreateReleaseAction();
         }
 
+        // Plugin class
+        $this->writePluginClass();
+
         // Git config
         $this->writeGitAttributes();
         $this->writeGitIgnore();
@@ -195,9 +198,6 @@ EOD));
         if ($this->addPhpStan) {
             $this->writePhpStanConfig();
         }
-
-        // Plugin class
-        $this->writePluginClass();
 
         // Settings
         if ($this->hasSettings) {
@@ -329,6 +329,52 @@ YAML;
             "$this->targetDir/.github/workflows/create-release.yml",
             $contents
         );
+    }
+
+    private function writePluginClass(): void
+    {
+        $file = new PhpFile();
+
+        $namespace = $file->addNamespace($this->rootNamespace)
+            ->addUse(Craft::class)
+            ->addUse(BasePlugin::class, $this->className === 'Plugin' ? 'BasePlugin' : null);
+
+        if ($this->hasSettings) {
+            $namespace->addUse(Model::class);
+            $namespace->addUse("$this->settingsNamespace\\$this->settingsClassName");
+        }
+
+        $class = $this->createClass($this->className, BasePlugin::class, [
+            self::CLASS_PROPERTIES => $this->pluginProperties(),
+            self::CLASS_METHODS => $this->pluginMethods(),
+        ]);
+        $namespace->add($class);
+
+        $class->setComment(<<<EOD
+$this->name plugin
+
+@method static $this->className getInstance()
+EOD);
+
+        if ($this->hasSettings) {
+            $class->addComment("@method $this->settingsClassName getSettings()");
+        }
+
+        if (!$this->private) {
+            $class->addComment(sprintf('@author %s%s', $this->developer, ($this->email ? " <$this->email>" : '')));
+            $class->addComment("@copyright $this->developer");
+            $class->addComment(sprintf('@license %s', $this->license === 'mit' ? 'MIT' : 'https://craftcms.github.io/license/ Craft License'));
+        }
+
+        $class->addMethod('attachEventHandlers')
+            ->setPrivate()
+            ->setReturnType('void')
+            ->setBody(<<<EOD
+// Register event handlers here ...
+// (see https://craftcms.com/docs/4.x/extend/events.html to get started)
+EOD);
+
+        $this->writePhpFile("$this->targetDir/src/$this->className.php", $file);
     }
 
     private function writeGitAttributes(): void
@@ -593,52 +639,6 @@ parameters:
 
 NEON;
         $this->command->writeToFile("$this->targetDir/phpstan.neon", $contents);
-    }
-
-    private function writePluginClass(): void
-    {
-        $file = new PhpFile();
-
-        $namespace = $file->addNamespace($this->rootNamespace)
-            ->addUse(Craft::class)
-            ->addUse(BasePlugin::class, $this->className === 'Plugin' ? 'BasePlugin' : null);
-
-        if ($this->hasSettings) {
-            $namespace->addUse(Model::class);
-            $namespace->addUse("$this->settingsNamespace\\$this->settingsClassName");
-        }
-
-        $class = $this->createClass($this->className, BasePlugin::class, [
-            self::CLASS_PROPERTIES => $this->pluginProperties(),
-            self::CLASS_METHODS => $this->pluginMethods(),
-        ]);
-        $namespace->add($class);
-
-        $class->setComment(<<<EOD
-$this->name plugin
-
-@method static $this->className getInstance()
-EOD);
-
-        if ($this->hasSettings) {
-            $class->addComment("@method $this->settingsClassName getSettings()");
-        }
-
-        if (!$this->private) {
-            $class->addComment(sprintf('@author %s%s', $this->developer, ($this->email ? " <$this->email>" : '')));
-            $class->addComment("@copyright $this->developer");
-            $class->addComment(sprintf('@license %s', $this->license === 'mit' ? 'MIT' : 'https://craftcms.github.io/license/ Craft License'));
-        }
-
-        $class->addMethod('attachEventHandlers')
-            ->setPrivate()
-            ->setReturnType('void')
-            ->setBody(<<<EOD
-// Register event handlers here ...
-// (see https://craftcms.com/docs/4.x/extend/events.html to get started)
-EOD);
-
-        $this->writePhpFile("$this->targetDir/src/$this->className.php", $file);
     }
 
     private function pluginProperties(): array
