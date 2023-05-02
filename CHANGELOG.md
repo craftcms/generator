@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- Improved the validation error for private plugins’ handle prompts, for handles that don’t begin with an underscore. ([#18](https://github.com/craftcms/generator/issues/18))
+
 ## 1.4.0 - 2023-04-19
 - Generated plugins now include a “Create Release” GitHub action, which will create a new GitHub Release whenever the Craft Plugin Store is notified of a new version tag.
 - Fixed a PHP error that occurred when generating a private plugin, if a different minimum Craft version was entered.

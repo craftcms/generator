@@ -83,6 +83,17 @@ EOD));
 
         $this->handle = $this->command->prompt('Plugin handle:', [
             'default' => ($this->private ? '_' : '') . StringHelper::toKebabCase($this->name),
+            'validator' => function(string $input, ?string &$error) {
+                if ($this->private && !StringHelper::startsWith($input, '_')) {
+                    $error = 'Private plugin handles must begin with an underscore.';
+                    return false;
+                }
+                if (!preg_match('/^_?%s$/', $input)) {
+                    $error = 'Invalid plugin handle.';
+                    return false;
+                }
+                return true;
+            },
             'pattern' => sprintf('/^\_?%s$/', self::ID_PATTERN),
         ]);
 
