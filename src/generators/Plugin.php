@@ -84,22 +84,19 @@ EOD));
         $this->handle = $this->command->prompt('Plugin handle:', [
             'default' => ($this->private ? '_' : '') . StringHelper::toKebabCase($this->name),
             'validator' => function(string $input, ?string &$error) {
-                if ($this->private && !StringHelper::startsWith($input, '_')) {
+                if ($this->private && !str_starts_with($input, '_')) {
                     $error = 'Private plugin handles must begin with an underscore.';
                     return false;
-                }
-                if (!preg_match('/^_?%s$/', $input)) {
-                    $error = 'Invalid plugin handle.';
+                } elseif (!$this->private && str_starts_with($input, '_')) {
+                    $error = 'Public plugin handles cannot begin with an underscore.';
+                    return false;
+                } elseif (!preg_match(sprintf('/^_?%s$/', self::ID_PATTERN), $input)) {
+                    $error = 'Plugin handles must be kebab-cased.';
                     return false;
                 }
                 return true;
             },
-            'pattern' => sprintf('/^\_?%s$/', self::ID_PATTERN),
         ]);
-
-        if ($this->private) {
-            $this->handle = StringHelper::ensureLeft($this->handle, '_');
-        }
 
         $this->targetDir = $this->directoryPrompt('Plugin location:', [
             'default' => sprintf('@root/plugins/%s', ltrim($this->handle, '_')),
