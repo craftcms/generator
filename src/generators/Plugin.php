@@ -9,6 +9,7 @@ namespace craft\generator\generators;
 
 use Composer\Json\JsonManipulator;
 use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
@@ -148,8 +149,17 @@ EOD));
             'pattern' => '/^[\d\.]+$/',
         ]);
 
+        if (
+            Comparator::greaterThanOrEqualTo($craftVersion, '4.4.0') &&
+            VersionParser::parseStability($craftVersion) === 'stable'
+        ) {
+            $defaultMinCraftVersion = preg_replace('/^(\d+\.\d+).*/', '$1.0', $craftVersion);
+        } else {
+            $defaultMinCraftVersion = $craftVersion;
+        }
+
         $this->minCraftVersion = $this->command->prompt('Minimum Craft CMS version:', [
-            'default' => $craftVersion,
+            'default' => $defaultMinCraftVersion,
             'validator' => function(string $input, ?string &$error) use ($minPrivatePluginVersion): bool {
                 if (!preg_match('/^[\d\.]+(-\w+(\.\d+)?)?$/', $input)) {
                     $error = 'Invalid version.';
