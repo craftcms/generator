@@ -60,10 +60,12 @@ class Plugin extends BaseGenerator
     {
         $this->name = $this->command->prompt('Plugin name:', [
             'required' => true,
+            'validator' => fn(string $input) => StringHelper::isUtf8($input),
         ]);
 
         $this->developer = $this->command->prompt('Developer name:', [
             'required' => true,
+            'validator' => fn(string $input) => StringHelper::isUtf8($input),
         ]);
 
         $craftVersion = Craft::$app->getVersion();
@@ -111,7 +113,9 @@ EOD));
             'pattern' => sprintf('/%s/', self::PACKAGE_NAME_PATTERN),
         ]);
 
-        $this->description = $this->command->prompt('Plugin description:');
+        $this->description = $this->command->prompt('Plugin description:', [
+            'validator' => fn(string $input) => StringHelper::isUtf8($input),
+        ]);
 
         if (!$this->private) {
             $this->license = $this->command->select('How should the plugin be licensed?', [
@@ -120,12 +124,15 @@ EOD));
             ]);
 
             $this->email = $this->command->prompt('Support email:', [
-                'validator' => function(string $input, ?string &$error): bool {
-                    return (new EmailValidator())->validate($input, $error);
-                },
+                'validator' => fn(string $input, ?string & $error) =>
+                    (new EmailValidator())->validate($input, $error) &&
+                    StringHelper::isUtf8($input),
             ]);
 
-            $this->repo = $this->command->prompt('GitHub repo URL:');
+            $this->repo = $this->command->prompt('GitHub repo URL:', [
+                'validator' => fn(string $input) => StringHelper::isUtf8($input),
+            ]);
+
             if ($this->repo) {
                 $this->repo = StringHelper::toLowerCase($this->repo);
                 $this->repo = str_replace('http://', 'https://', $this->repo);
