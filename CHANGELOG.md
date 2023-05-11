@@ -2,6 +2,9 @@
 
 ## Unreleased
 - Improved the validation error for private plugins’ handle prompts, for handles that don’t begin with an underscore. ([#18](https://github.com/craftcms/generator/issues/18))
+- The plugin generator’s “Minimum Craft CMS version” prompt now defaults to the initial minor release of the current Craft version (e.g. `4.4.0` rather than `4.4.11`), if running a stable release of Craft 4.4 or later.
+- Fixed a bug where it was possible to enter invalid UTF-8 characters into the plugin generator prompts, causing an exception when writing the `composer.json` file.
+- Craft CMS 4.4.11+ is now required.
 
 ## 1.4.0 - 2023-04-19
 - Generated plugins now include a “Create Release” GitHub action, which will create a new GitHub Release whenever the Craft Plugin Store is notified of a new version tag.
