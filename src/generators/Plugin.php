@@ -16,9 +16,11 @@ use craft\base\Plugin as BasePlugin;
 use craft\generator\BaseGenerator;
 use craft\generator\helpers\Code;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Console;
 use craft\helpers\FileHelper;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
+use GuzzleHttp\Exception\RequestException;
 use Nette\PhpGenerator\PhpFile;
 use yii\validators\EmailValidator;
 
@@ -84,6 +86,7 @@ EOD));
             $this->private = false;
         }
 
+        handle:
         $this->handle = $this->command->prompt('Plugin handle:', [
             'default' => ($this->private ? '_' : '') . StringHelper::toKebabCase($this->name),
             'validator' => function(string $input, ?string &$error) {
@@ -100,6 +103,27 @@ EOD));
                 return true;
             },
         ]);
+
+        if (!$this->private) {
+            $response = null;
+            $this->command->stdout('Checking handle uniqueness … ');
+            try {
+                $response = Craft::createGuzzleClient()->head("https://api.craftcms.com/v1/plugin/$this->handle");
+            } catch (RequestException) {
+            }
+            $taken = $response?->getStatusCode() === 200;
+            if ($taken) {
+                $this->command->stdout('✕' . PHP_EOL, Console::FG_RED, Console::BOLD);
+                $this->command->stdout(PHP_EOL);
+                $this->command->stdout($this->command->markdownToAnsi("A plugin already exists with the handle `$this->handle`."));
+                if (!$this->command->confirm("\nAre you sure you want to continue?")) {
+                    goto handle;
+                }
+            } else {
+                $this->command->stdout('✓', Console::FG_GREEN, Console::BOLD);
+                $this->command->stdout(PHP_EOL);
+            }
+        }
 
         $this->targetDir = $this->directoryPrompt('Plugin location:', [
             'default' => sprintf('@root/plugins/%s', ltrim($this->handle, '_')),
