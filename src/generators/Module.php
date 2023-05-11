@@ -139,6 +139,8 @@ MD,
         $class = $this->createClass('Module', YiiModule::class, [
             self::CLASS_METHODS => $this->methods(),
         ]);
+        $class->getMethod('init')
+            ->setReturnType('void');
         $namespace->add($class);
 
         $class->setComment(<<<EOD

@@ -373,6 +373,8 @@ YAML;
             self::CLASS_PROPERTIES => $this->pluginProperties(),
             self::CLASS_METHODS => $this->pluginMethods(),
         ]);
+        $class->getMethod('init')
+            ->setReturnType('void');
         $namespace->add($class);
 
         $class->setComment(<<<EOD
