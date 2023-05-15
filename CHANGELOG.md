@@ -1,6 +1,6 @@
 # Release Notes for Craft Generator
 
-## Unreleased
+## 1.5.0 - 2023-05-15
 - Improved the validation error for private plugins’ handle prompts, for handles that don’t begin with an underscore. ([#18](https://github.com/craftcms/generator/issues/18))
 - The plugin generator’s “Minimum Craft CMS version” prompt now defaults to the initial minor release of the current Craft version (e.g. `4.4.0` rather than `4.4.11`), if running a stable release of Craft 4.4 or later.
 - The plugin generator now warns against using non-unique plugin handles.
