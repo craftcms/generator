@@ -263,6 +263,18 @@ MD;
 
         $composerDir = dirname($this->composerFile);
         $composerConfig = Json::decodeFromFile($this->composerFile);
+
+        if (($composerConfig['minimum-stability'] ?? null) !== 'dev' || !isset($composerConfig['prefer-stable'])) {
+            $baseNewConfig = [
+                'minimum-stability' => 'dev',
+            ];
+            if (!isset($composerConfig['prefer-stable'])) {
+                $baseNewConfig['prefer-stable'] = true;
+            }
+            $composerConfig = $baseNewConfig + $composerConfig;
+            $this->command->writeJson($this->composerFile, $composerConfig);
+        }
+
         $repositories = $composerConfig['repositories'] ?? [];
 
         foreach ($repositories as $repoConfig) {

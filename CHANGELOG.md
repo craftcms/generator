@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- The plugin generator now ensures that the project’s `composer.json` file has `minimum-stability: dev` and `prefer-stable: true` set. ([#22](https://github.com/craftcms/generator/issues/22))
+
 ## 1.5.0 - 2023-05-15
 - Improved the validation error for private plugins’ handle prompts, for handles that don’t begin with an underscore. ([#18](https://github.com/craftcms/generator/issues/18))
 - The plugin generator’s “Minimum Craft CMS version” prompt now defaults to the initial minor release of the current Craft version (e.g. `4.4.0` rather than `4.4.11`), if running a stable release of Craft 4.4 or later.
