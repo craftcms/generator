@@ -733,13 +733,44 @@ abstract class BaseGenerator extends BaseObject
     protected function messagePhp(string $message): string
     {
         $messagePhp = var_export($message, true);
-        $category = match (true) {
+        $category = $this->getTranslationCategory();
+
+        return $category ? sprintf("Craft::t('%s', %s)", $category, $messagePhp) : $messagePhp;
+    }
+
+    /**
+     * Places a string into a Twig translation statement.
+     *
+     * Output is not enclosed in any `{{ ... }}` or `{% ... %}` tags.
+     *
+     * @param string $message The string to output
+     * @return string Twig statement
+     */
+    protected function messageTwig(string $message): string
+    {
+        $messageTwig = var_export($message, true);
+        $category = $this->getTranslationCategory();
+
+        return $category ? sprintf("'%1\$s\'|t('%2\$s\', %1\$s)", $category, $messageTwig) : $messageTwig;
+    }
+
+    /**
+     * Resolves an appropriate translation category for the target module/component.
+     *
+     * The result is not guaranteed to be valid:
+     * - Modules can register translation categories with any handle/ID they like (and the ID of a module can change at any time);
+     * - Plugins may register additional translation categories (non-standard) that we don’t/can’t know about;
+     * - The `site` translation category used by the front-end (and some modules) is not taken into consideration;
+     *
+     * @return string|null Translation category handle
+     */
+    protected function getTranslationCategory(): ?string
+    {
+        return match (true) {
             $this->module instanceof Application => 'app',
             $this->module instanceof PluginInterface => $this->module->id,
             default => null,
         };
-
-        return $category ? sprintf("Craft::t('%s', %s)", $category, $messagePhp) : $messagePhp;
     }
 
     /**
