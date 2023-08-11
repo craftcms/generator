@@ -128,7 +128,7 @@ Add `$this->componentId` to the module’s definition in `config/app.php` to reg
 ```
 'modules' => [
     '{$this->module->id}' => [
-        'class' => \\$moduleClass::class,
+        'class' => $moduleClass::class,
         'components' => [
             '$this->componentId' => $serviceClass::class,
         ],
