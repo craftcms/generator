@@ -733,7 +733,7 @@ abstract class BaseGenerator extends BaseObject
     protected function messagePhp(string $message): string
     {
         $messagePhp = var_export($message, true);
-        $category = $this->getTranslationCategory();
+        $category = $this->translationCategory();
 
         return $category ? sprintf("Craft::t('%s', %s)", $category, $messagePhp) : $messagePhp;
     }
@@ -745,11 +745,12 @@ abstract class BaseGenerator extends BaseObject
      *
      * @param string $message The string to output
      * @return string Twig statement
+     * @since 1.6.0
      */
     protected function messageTwig(string $message): string
     {
         $messageTwig = var_export($message, true);
-        $category = $this->getTranslationCategory();
+        $category = $this->translationCategory();
 
         return $category ? sprintf("'%1\$s\'|t('%2\$s\', %1\$s)", $category, $messageTwig) : $messageTwig;
     }
@@ -764,7 +765,7 @@ abstract class BaseGenerator extends BaseObject
      *
      * @return string|null Translation category handle
      */
-    protected function getTranslationCategory(): ?string
+    private function translationCategory(): ?string
     {
         return match (true) {
             $this->module instanceof Application => 'app',
