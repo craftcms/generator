@@ -1,6 +1,6 @@
 # Release Notes for Craft Generator
 
-## Unreleased
+## 1.6.0 - 2023-08-10
 - Added `craft\generator\BaseGenerator::messageTwig()`. ([#25](https://github.com/craftcms/generator/pull/25))
 - The plugin generator now ensures that the project’s `composer.json` file has `minimum-stability: dev` and `prefer-stable: true` set. ([#22](https://github.com/craftcms/generator/issues/22))
 - Fixed a bug where the Service generator was suggesting adding a `config()` method which defined the service config, even when the target was a module. ([#24](https://github.com/craftcms/generator/issues/24))
