@@ -147,7 +147,6 @@ You should also add a `@property-read` tag to the $moduleClass class’s DocBloc
  */
 ```
 MD;
-
         }
 
         $this->command->success($message);
