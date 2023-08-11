@@ -2,6 +2,7 @@
 
 ## Unreleased
 - The plugin generator now ensures that the project’s `composer.json` file has `minimum-stability: dev` and `prefer-stable: true` set. ([#22](https://github.com/craftcms/generator/issues/22))
+- Fixed a bug where the Service generator was suggesting adding a `config()` method which defined the service config, even when the target was a module. ([#24](https://github.com/craftcms/generator/issues/24))
 
 ## 1.5.0 - 2023-05-15
 - Improved the validation error for private plugins’ handle prompts, for handles that don’t begin with an underscore. ([#18](https://github.com/craftcms/generator/issues/18))

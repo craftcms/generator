@@ -99,8 +99,13 @@ class Service extends BaseGenerator
                 })
             )
         ) {
-            $moduleFile = $this->moduleFile();
-            $message .= "\n" . <<<MD
+            $message .= "\n";
+            $moduleClass = '\\' . get_class($this->module);
+            $serviceClass = '\\' . $this->namespace . '\\' . $this->className;
+
+            if ($this->module instanceof PluginInterface) {
+                $moduleFile = $this->moduleFile();
+                $message .= <<<MD
 Add the following code to `$moduleFile` to register the service:
 
 ```
@@ -110,20 +115,39 @@ public static function config(): array
 {
     return [
         'components' => [
-            '$this->componentId' => $this->className::class,
+            '$this->componentId' => $serviceClass::class,
         ],
     ];
 }
 ```
+MD;
+            } else {
+                $message .= <<<MD
+Add `$this->componentId` to the module’s definition in `config/app.php` to register the service:
 
-You should also add a `@property-read` tag to the class’s DocBlock comment, to help with IDE autocompletion:
+```
+'modules' => [
+    '{$this->module->id}' => [
+        'class' => \\$moduleClass::class,
+        'components' => [
+            '$this->componentId' => $serviceClass::class,
+        ],
+    ],
+],
+```
+MD;
+            }
+
+            $message .= "\n\n" . <<<MD
+You should also add a `@property-read` tag to the $moduleClass class’s DocBlock comment, to help with IDE autocompletion:
 
 ```
 /**
- * @property-read $this->className \$$this->componentId
+ * @property-read $serviceClass \$$this->componentId
  */
 ```
 MD;
+
         }
 
         $this->command->success($message);
