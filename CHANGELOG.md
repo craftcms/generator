@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- Added the behavior generator. ([#27](https://github.com/craftcms/generator/pull/27))
+
 ## 1.6.1 - 2023-08-10
 - Fixed a double-backslash bug.
 
