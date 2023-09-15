@@ -67,7 +67,7 @@ Craft::\$app->getView()->registerJsWithVars(fn(\$type) => <<<JS
             bulk: true,
     
             // Return whether the action should be available depending on which elements are selected
-            validateSelection: (selectedItems) {
+            validateSelection: (selectedItems) => {
               return true;
             },
     
