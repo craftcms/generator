@@ -81,6 +81,8 @@ Craft::\$app->getView()->registerJsWithVars(fn(\$type) => <<<JS
         });
     })();
 JS, [static::class]);
+
+return null;
 PHP,
             'performAction' => <<<PHP
 \$elements = \$query->all();
