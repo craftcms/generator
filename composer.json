@@ -22,8 +22,8 @@
     "rss": "https://github.com/craftcms/generator/releases.atom"
   },
   "require": {
-    "php": "^8.0.2",
-    "craftcms/cms": "^4.4.11",
+    "php": "^8.2",
+    "craftcms/cms": "^5.0.0-alpha",
     "nette/php-generator": "^4.0",
     "nikic/php-parser": "^4.15"
   },
@@ -50,7 +50,7 @@
   "config": {
     "sort-packages": true,
     "platform": {
-      "php": "8.0.2"
+      "php": "8.2"
     },
     "allow-plugins": {
       "yiisoft/yii2-composer": true,

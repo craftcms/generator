@@ -10,6 +10,7 @@ namespace craft\generator\generators;
 use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
+use craft\base\InlineEditableFieldInterface;
 use craft\base\PreviewableFieldInterface;
 use craft\base\SortableFieldInterface;
 use craft\elements\db\ElementQueryInterface;
@@ -24,6 +25,7 @@ use craft\helpers\Html;
 use craft\helpers\StringHelper;
 use craft\services\Fields;
 use Nette\PhpGenerator\PhpNamespace;
+use yii\db\ExpressionInterface;
 use yii\db\Schema;
 use yii\helpers\Inflector;
 
@@ -38,6 +40,7 @@ class FieldType extends BaseGenerator
     private string $namespace;
     private string $displayName;
     private bool $previewable;
+    private bool $inlineEditable;
     private bool $sortable;
     private ?string $conditionRuleType = null;
 
@@ -54,6 +57,7 @@ class FieldType extends BaseGenerator
         $this->displayName = Inflector::camel2words($this->className);
 
         $this->previewable = $this->command->confirm("Should $this->displayName fields be previewable in element indexes?");
+        $this->inlineEditable = $this->previewable && $this->command->confirm("Should $this->displayName fields be inline-editable from element indexes?");
         $this->sortable = $this->command->confirm("Should $this->displayName fields be sortable in element indexes?");
 
         if ($this->command->confirm("Should $this->displayName fields have element condition rules?")) {
@@ -85,6 +89,7 @@ class FieldType extends BaseGenerator
             ->addUse(ElementQueryInterface::class)
             ->addUse(Field::class)
             ->addUse(Html::class)
+            ->addUse(ExpressionInterface::class)
             ->addUse(Schema::class)
             ->addUse(StringHelper::class);
 
@@ -99,7 +104,10 @@ class FieldType extends BaseGenerator
 
         $class->setComment("$this->displayName field type");
 
-        if ($this->previewable) {
+        if ($this->inlineEditable) {
+            $namespace->addUse(InlineEditableFieldInterface::class);
+            $class->addImplement(InlineEditableFieldInterface::class);
+        } elseif ($this->previewable) {
             $namespace->addUse(PreviewableFieldInterface::class);
             $class->addImplement(PreviewableFieldInterface::class);
         }
@@ -145,7 +153,12 @@ MD;
 
         return [
             'displayName' => sprintf('return %s;', $this->messagePhp($this->displayName)),
-            'valueType' => "return 'mixed';",
+            'phpType' => "return 'mixed';",
+            'dbType' => <<<PHP
+// Replace with the appropriate data type this field will store in the database,
+// or `null` if the field is managing its own data storage.
+return Schema::TYPE_STRING;
+PHP,
             'attributeLabels' => <<<PHP
 return array_merge(parent::attributeLabels(), [
     // ...
@@ -157,13 +170,12 @@ return array_merge(parent::defineRules(), [
 ]);
 PHP,
             'getSettingsHtml' => 'return null;',
-            'getContentColumnType' => 'return Schema::TYPE_STRING;',
             'normalizeValue' => 'return $value;',
             'inputHtml' => 'return Html::textarea($this->handle, $value);',
             'getElementValidationRules' => 'return [];',
             'searchKeywords' => "return StringHelper::toString(\$value, ' ');",
             'getElementConditionRuleType' => $this->conditionRuleType ? "return $conditionRuleClassName::class;" : 'return null;',
-            'modifyElementsQuery' => 'parent::modifyElementsQuery($query, $value);',
+            'queryCondition' => 'return parent::queryCondition($instances, $value, $params);',
         ];
     }
 }

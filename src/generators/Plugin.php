@@ -7,7 +7,6 @@
 
 namespace craft\generator\generators;
 
-use Composer\Json\JsonManipulator;
 use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Craft;
@@ -336,14 +335,8 @@ MD;
             'url' => FileHelper::relativePath($this->targetDir, $composerDir, '/'),
         ];
 
-        // First try adding it with JsonManipulator
-        $manipulator = new JsonManipulator(file_get_contents($this->composerFile));
-        if ($manipulator->addRepository($pluginRepoName, $pluginRepoConfig)) {
-            $this->command->writeToFile($this->composerFile, $manipulator->getContents());
-        } else {
-            $composerConfig['repositories'][$pluginRepoName] = $pluginRepoConfig;
-            $this->command->writeJson($this->composerFile, $composerConfig);
-        }
+        $composerConfig['repositories'][$pluginRepoName] = $pluginRepoConfig;
+        $this->command->writeJson($this->composerFile, $composerConfig);
 
         $message = <<<MD
 **Plugin created!**
