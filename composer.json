@@ -21,6 +21,8 @@
     "source": "https://github.com/craftcms/generator",
     "rss": "https://github.com/craftcms/generator/releases.atom"
   },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "require": {
     "php": "^8.2",
     "craftcms/cms": "^5.0.0-alpha",
