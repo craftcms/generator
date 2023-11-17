@@ -2,6 +2,7 @@
 
 ## 2.0.0 (WIP)
 - Craft Generator now requires Craft 5.
+- Renamed `craft\generator\Command\EVENT_REGISTER_GENERATOR_TYPES` to `EVENT_REGISTER_GENERATORS`.
 
 ## 1.6.1 - 2023-08-10
 - Fixed a double-backslash bug.

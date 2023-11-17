@@ -135,7 +135,7 @@ PHP);
             $this->isForModule() &&
             !$this->addRegistrationEventHandlerCode(
                 CommandCommand::class,
-                'EVENT_REGISTER_GENERATOR_TYPES',
+                'EVENT_REGISTER_GENERATORS',
                 "$this->namespace\\$this->className",
                 $fallbackExample,
                 true,

@@ -26,9 +26,9 @@ use yii\console\ExitCode;
 class Command extends Controller
 {
     /**
-     * @event RegisterComponentTypesEvent The event that is triggered when registering generator types.
+     * @event RegisterComponentTypesEvent The event that is triggered when registering generators.
      *
-     * Generator types must extend [[BaseGenerator]].
+     * Generators must extend [[BaseGenerator]].
      * ---
      * ```php
      * use craft\events\RegisterComponentTypesEvent;
@@ -38,7 +38,7 @@ class Command extends Controller
      * if (class_exists(Command::class)) {
      *     Event::on(
      *         Command::class,
-     *         Command::EVENT_REGISTER_GENERATOR_TYPES,
+     *         Command::EVENT_REGISTER_GENERATORS,
      *         function(RegisterComponentTypesEvent $event) {
      *             $event->types[] = MyGenerator::class;
      *         }
@@ -46,7 +46,7 @@ class Command extends Controller
      * }
      * ```
      */
-    public const EVENT_REGISTER_GENERATOR_TYPES = 'registerGeneratorTypes';
+    public const EVENT_REGISTER_GENERATORS = 'registerGenerators';
 
     /**
      * @inheritdoc
@@ -300,7 +300,7 @@ class Command extends Controller
         $event = new RegisterComponentTypesEvent([
             'types' => $types,
         ]);
-        $this->trigger(self::EVENT_REGISTER_GENERATOR_TYPES, $event);
+        $this->trigger(self::EVENT_REGISTER_GENERATORS, $event);
 
         return $event->types;
     }
