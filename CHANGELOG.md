@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## 2.0.0 (WIP)
+- Craft Generator now requires Craft 5.
+
 ## 1.6.1 - 2023-08-10
 - Fixed a double-backslash bug.
 
