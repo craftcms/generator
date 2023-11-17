@@ -112,7 +112,7 @@ class ElementConditionRule extends BaseGenerator
 
         $this->command->success(<<<MD
 **Element condition rule created!**
-Register it for use in a condition by including it in the condition’s `conditionRuleTypes()` method.
+Register it for use in a condition by including it in the condition’s `selectableConditionRules()` method.
 MD);
         return true;
     }

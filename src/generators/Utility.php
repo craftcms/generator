@@ -57,7 +57,7 @@ class Utility extends BaseGenerator
             $this->isForModule() &&
             !$this->addRegistrationEventHandlerCode(
                 Utilities::class,
-                'EVENT_REGISTER_UTILITY_TYPES',
+                'EVENT_REGISTER_UTILITIES',
                 "$this->namespace\\$this->className",
                 $fallbackExample,
             )
