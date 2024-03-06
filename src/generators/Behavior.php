@@ -8,8 +8,10 @@
 namespace craft\generator\generators;
 
 use craft\events\DefineBehaviorsEvent;
+use craft\helpers\ArrayHelper;
 use Nette\PhpGenerator\PhpNamespace;
 use craft\generator\BaseGenerator;
+use ReflectionClass;
 use yii\base\Behavior as BaseBehavior;
 use yii\helpers\Inflector;
 
@@ -38,13 +40,15 @@ class Behavior extends BaseGenerator
         $this->targetClass = $this->classPrompt('Target class (optional):', [
             'ensureExists' => true,
             'validator' => function(string $class, &$error) {
-                if (defined("{$class}::EVENT_DEFINE_BEHAVIORS")) {
-                    return true;
+                if (!class_exists($class)) {
+                    $error = "$class does not exist.";
+                    return false;
                 }
-
-                $error = 'You must choose a class that emits an `EVENT_DEFINE_BEHAVIORS` event in order to automatically attach Behaviors to it.';
-
-                return false;
+                if (!(new ReflectionClass($class))->hasConstant('EVENT_DEFINE_BEHAVIORS')) {
+                    $error = "$class doesn’t define an EVENT_DEFINE_BEHAVIORS event.";
+                    return false;
+                }
+                return true;
             },
         ]);
 
@@ -67,7 +71,9 @@ class Behavior extends BaseGenerator
 
         // If a class was chosen, add the @property tag:
         if ($this->targetClass) {
-            $comment .= "\n\n" . "@property $this->targetClass \$owner";
+            $classParts = explode('\\', $this->targetClass);
+            $className = end($classParts);
+            $comment .= "\n\n" . "@property $className \$owner";
         }
 
         $class->setComment($comment);
@@ -101,7 +107,7 @@ MD;
 
         if (!$this->targetClass) {
             $message .= "\n" . <<<MD
-Your new behavior was not configured to be attached to any classes. You may need to add custom event logic to register it with the system.
+You can register your behavior from a component class’s `behaviors()`/`defineBehaviors()` method, or via an `EVENT_DEFINE_BEHAVIORS` event. 
 MD;
         }
 
@@ -112,11 +118,11 @@ MD;
     private function methods(): array
     {
         return [
-            'events' => $this->targetClass ? <<<PHP
+            'events' => <<<PHP
 return [
-    // {$this->targetClass}::EVENT_INIT => [\$this, 'myInitMethod'],
+    // ...
 ];
-PHP : 'return [];',
+PHP,
         ];
     }
 }
