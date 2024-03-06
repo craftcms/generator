@@ -64,7 +64,7 @@ class Command extends Controller
      */
     public bool $withStrictTypes = false;
 
-        /**
+    /**
      * @var bool
      */
     private bool $_app = false;
