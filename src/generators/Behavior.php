@@ -8,9 +8,8 @@
 namespace craft\generator\generators;
 
 use craft\events\DefineBehaviorsEvent;
-use craft\helpers\ArrayHelper;
-use Nette\PhpGenerator\PhpNamespace;
 use craft\generator\BaseGenerator;
+use Nette\PhpGenerator\PhpNamespace;
 use ReflectionClass;
 use yii\base\Behavior as BaseBehavior;
 use yii\helpers\Inflector;
