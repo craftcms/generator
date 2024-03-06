@@ -59,6 +59,12 @@ class Command extends Controller
     public bool $withDocblocks = false;
 
     /**
+     * @var bool Whether generated files should have `declare(strict_types=1)`.
+     * @since 1.7.0
+     */
+    public bool $withStrictTypes = false;
+
+        /**
      * @var bool
      */
     private bool $_app = false;
@@ -86,6 +92,7 @@ class Command extends Controller
         // Don't include app/module/plugin since `module` conflicts with yii\base\Controller::$module
         return array_merge(parent::options($actionID), [
             'withDocblocks',
+            'withStrictTypes',
         ]);
     }
 

@@ -31,12 +31,18 @@ class Module extends BaseGenerator
     private string $id;
     private string $targetDir;
     private string $rootNamespace;
+    private string $className;
     private bool $bootstrap;
 
     public function run(): bool
     {
         $this->id = $this->idPrompt('Module ID:', [
             'required' => true,
+        ]);
+
+        $this->className = $this->classNamePrompt('Base module class name:', [
+            'required' => true,
+            'default' => 'Module',
         ]);
 
         [$this->targetDir, $this->rootNamespace, $addedRoot] = $this->autoloadableDirectoryPrompt('Module location:', [
@@ -68,7 +74,7 @@ MD;
         $appConfigPath = Craft::$app->getConfig()->getConfigFilePath('app');
 
         if (!$this->modifyFile($appConfigPath, function(Workspace $workspace) {
-            $moduleClassName = $workspace->importClass("$this->rootNamespace\\Module");
+            $moduleClassName = $workspace->importClass("$this->rootNamespace\\$this->className");
 
             if (!$workspace->modifyCode(new NodeVisitor(
                 enterNode: function(Node $node) use ($workspace, $moduleClassName) {
@@ -101,7 +107,7 @@ MD;
         })) {
             $fallbackExample = <<<MD
 'modules' => [
-    '$this->id' => \\$this->rootNamespace\\Module::class,
+    '$this->id' => \\$this->rootNamespace\\$this->className::class,
 ],
 MD;
             if ($this->bootstrap) {
@@ -131,22 +137,25 @@ MD,
     private function writeModuleClass(): void
     {
         $file = new PhpFile();
+        $file->setStrictTypes($this->command->withStrictTypes);
 
         $namespace = $file->addNamespace($this->rootNamespace)
             ->addUse(Craft::class)
             ->addUse(YiiModule::class, 'BaseModule');
 
-        $class = $this->createClass('Module', YiiModule::class, [
+        $class = $this->createClass($this->className, YiiModule::class, [
             self::CLASS_METHODS => $this->methods(),
         ]);
         $class->getMethod('init')
             ->setReturnType('void');
         $namespace->add($class);
 
-        $class->setComment(<<<EOD
-$this->id module
+        $name = $this->className !== 'Module' ? $this->className : $this->id;
 
-@method static Module getInstance()
+        $class->setComment(<<<EOD
+$name module
+
+@method static $this->className getInstance()
 EOD
         );
 
