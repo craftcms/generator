@@ -395,6 +395,7 @@ YAML;
     private function writePluginClass(): void
     {
         $file = new PhpFile();
+        $file->setStrictTypes($this->command->withStrictTypes);
 
         $namespace = $file->addNamespace($this->rootNamespace)
             ->addUse(Craft::class)
@@ -748,6 +749,7 @@ PHP
     private function writeSettingsModel(): void
     {
         $file = new PhpFile();
+        $file->setStrictTypes($this->command->withStrictTypes);
 
         $namespace = $file->addNamespace($this->settingsNamespace)
             ->addUse(Craft::class)

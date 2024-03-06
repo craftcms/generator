@@ -701,6 +701,7 @@ abstract class BaseGenerator extends BaseObject
         $path = sprintf('%s/%s.php', $basePath, $class->getName());
 
         $file = new PhpFile();
+        $file->setStrictTypes($this->command->withStrictTypes);
         $file->addNamespace($namespace);
         $this->writePhpFile($path, $file);
     }
