@@ -44,6 +44,7 @@ You can create new system components using the following commands:
 
 ```sh
 php craft make asset-bundle
+php craft make behavior
 php craft make command
 php craft make controller
 php craft make element-action
