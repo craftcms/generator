@@ -3,6 +3,7 @@
 ## Unreleased
 - Generator now prompts for new modules’ names. ([#28](https://github.com/craftcms/generator/pull/28))
 - Added the `--with-strict-types` option. ([#29](https://github.com/craftcms/generator/pull/29))
+- Fixed issues with the default `getTriggerHtml()` method output for generated element actions. ([#30](https://github.com/craftcms/generator/pull/30))
 
 ## 1.6.1 - 2023-08-10
 - Fixed a double-backslash bug.
