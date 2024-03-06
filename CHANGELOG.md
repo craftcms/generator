@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- Generator now prompts for new modules’ names. ([#28](https://github.com/craftcms/generator/pull/28))
+
 ## 1.6.1 - 2023-08-10
 - Fixed a double-backslash bug.
 
