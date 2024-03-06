@@ -1,6 +1,6 @@
 # Release Notes for Craft Generator
 
-## 2.0.0 (WIP)
+## 2.0.0 - 2024-03-06
 - Craft Generator now requires Craft 5.
 - Renamed `craft\generator\Command\EVENT_REGISTER_GENERATOR_TYPES` to `EVENT_REGISTER_GENERATORS`.
 
