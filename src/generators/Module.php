@@ -137,7 +137,7 @@ MD,
     private function writeModuleClass(): void
     {
         $file = new PhpFile();
-        $file->setStrictTypes();
+        $file->setStrictTypes($this->command->withStrictTypes);
 
         $namespace = $file->addNamespace($this->rootNamespace)
             ->addUse(Craft::class)
