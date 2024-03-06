@@ -4,6 +4,12 @@
 - Craft Generator now requires Craft 5.
 - Renamed `craft\generator\Command\EVENT_REGISTER_GENERATOR_TYPES` to `EVENT_REGISTER_GENERATORS`.
 
+## 1.7.0 - 2024-03-06
+- Added the behavior generator. ([#27](https://github.com/craftcms/generator/pull/27))
+- Generator now prompts for new modules’ names. ([#28](https://github.com/craftcms/generator/pull/28))
+- Added the `--with-strict-types` option. ([#29](https://github.com/craftcms/generator/pull/29))
+- Fixed issues with the default `getTriggerHtml()` method output for generated element actions. ([#30](https://github.com/craftcms/generator/pull/30))
+
 ## 1.6.1 - 2023-08-10
 - Fixed a double-backslash bug.
 
