@@ -168,7 +168,6 @@ MD;
             'pluralLowerDisplayName' => sprintf('return %s;', $this->messagePhp($pluralLowerDisplayName)),
             'refHandle' => sprintf("return '%s';", strtolower($this->className)),
             'trackChanges' => 'return true;',
-            'hasContent' => 'return true;',
             'hasTitles' => 'return true;',
             'hasUris' => 'return true;',
             'isLocalized' => 'return false;',
@@ -364,7 +363,7 @@ PHP,
     private function conditionClassMethods(): array
     {
         return [
-            'conditionRuleTypes' => <<<PHP
+            'selectableConditionRules' => <<<PHP
 return array_merge(parent::conditionRuleTypes(), [
     // ...
 ]);
