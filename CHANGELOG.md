@@ -1,6 +1,6 @@
 # Release Notes for Craft Generator
 
-## Unreleased
+## 1.7.0 - 2024-03-06
 - Added the behavior generator. ([#27](https://github.com/craftcms/generator/pull/27))
 - Generator now prompts for new modules’ names. ([#28](https://github.com/craftcms/generator/pull/28))
 - Added the `--with-strict-types` option. ([#29](https://github.com/craftcms/generator/pull/29))
