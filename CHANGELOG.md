@@ -1,5 +1,9 @@
 # Release Notes for Craft Generator
 
+## 2.0.1 - 2024-03-08
+- Generated field types, utilities, and widget types now provide default icons.
+- Fixed an error that occurred when generating a utility. ([#34](https://github.com/craftcms/generator/issues/34))
+
 ## 2.0.0 - 2024-03-06
 - Craft Generator now requires Craft 5.
 - Renamed `craft\generator\Command\EVENT_REGISTER_GENERATOR_TYPES` to `EVENT_REGISTER_GENERATORS`.

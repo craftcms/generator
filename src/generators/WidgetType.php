@@ -79,7 +79,7 @@ MD;
         return [
             'displayName' => sprintf('return %s;', $this->messagePhp($this->displayName)),
             'isSelectable' => 'return true;',
-            'icon' => 'return null;',
+            'icon' => 'return \'chart-line\';',
             'getBodyHtml' => <<<PHP
 // todo: replace with custom body HTML
 return '';

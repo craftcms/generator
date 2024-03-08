@@ -153,6 +153,7 @@ MD;
 
         return [
             'displayName' => sprintf('return %s;', $this->messagePhp($this->displayName)),
+            'icon' => 'return \'i-cursor\';',
             'phpType' => "return 'mixed';",
             'dbType' => <<<PHP
 // Replace with the appropriate data type this field will store in the database,

@@ -81,7 +81,7 @@ MD;
         return [
             'displayName' => sprintf('return %s;', $this->messagePhp($this->displayName)),
             'id' => "return '$this->utilityId';",
-            'iconPath' => 'return null;',
+            'icon' => 'return \'wrench\';',
             'contentHtml' => <<<PHP
 // todo: replace with custom content HTML
 return '';
