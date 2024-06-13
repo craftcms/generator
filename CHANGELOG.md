@@ -1,8 +1,5 @@
 # Release Notes for Craft Generator
 
-## Unreleased
-- Fix links to [Events documentation](https://craftcms.com/docs/5.x/extend/events.html) for v2 (Craft 5).
-
 ## 2.0.1 - 2024-03-08
 - Generated field types, utilities, and widget types now provide default icons.
 - Fixed an error that occurred when generating a utility. ([#34](https://github.com/craftcms/generator/issues/34))
