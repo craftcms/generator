@@ -164,7 +164,7 @@ EOD
             ->setReturnType('void')
             ->setBody(<<<EOD
 // Register event handlers here ...
-// (see https://craftcms.com/docs/4.x/extend/events.html to get started)
+// (see https://craftcms.com/docs/5.x/extend/events.html to get started)
 EOD);
 
         $this->writePhpClass($namespace);
