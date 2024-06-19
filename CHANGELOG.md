@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## 1.8.0 - 2024-06-19
+- Generated plugins and modules now call `$this->attachEventHandlers()` directly from `init()`, and clarify when `onInit()` should be used.
+
 ## 1.7.0 - 2024-03-06
 - Added the behavior generator. ([#27](https://github.com/craftcms/generator/pull/27))
 - Generator now prompts for new modules’ names. ([#28](https://github.com/craftcms/generator/pull/28))

@@ -726,9 +726,11 @@ PHP,
             'init' => <<<PHP
 parent::init();
 
-// Defer most setup tasks until Craft is fully initialized
+\$this->attachEventHandlers();
+
+// Any code that creates an element query or loads Twig should be deferred until
+// after Craft is fully initialized, to avoid conflicts with other plugins/modules
 Craft::\$app->onInit(function() {
-    \$this->attachEventHandlers();
     // ...
 });
 PHP,
