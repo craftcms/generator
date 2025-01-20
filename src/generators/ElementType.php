@@ -364,7 +364,7 @@ PHP,
     {
         return [
             'selectableConditionRules' => <<<PHP
-return array_merge(parent::conditionRuleTypes(), [
+return array_merge(parent::selectableConditionRules(), [
     // ...
 ]);
 PHP,
