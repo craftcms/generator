@@ -1,6 +1,6 @@
 # Release Notes for Craft Generator
 
-## Unreleased
+## 2.2.0 - 2025-05-29
 - Updated nikic/php-parser to v5. ([#40](https://github.com/craftcms/generator/pull/40))
 
 ## 2.1.0 - 2024-06-19
