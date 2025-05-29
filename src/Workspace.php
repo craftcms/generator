@@ -14,7 +14,6 @@ use Nette\PhpGenerator\Constant;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PsrPrinter;
 use PhpParser\Comment\Doc;
-use PhpParser\Lexer\Emulative;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Array_;
@@ -30,7 +29,7 @@ use PhpParser\NodeAbstract;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor as NodeVisitorInterface;
 use PhpParser\NodeVisitor\CloningVisitor;
-use PhpParser\Parser\Php7;
+use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use yii\base\Event;
 use yii\base\InvalidArgumentException;
@@ -226,18 +225,10 @@ PHP;
     {
         // Format-preserving pretty printing setup
         // see https://github.com/nikic/PHP-Parser/blob/4.x/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
-        $lexer = new Emulative([
-            'usedAttributes' => [
-                'comments',
-                'startLine', 'endLine',
-                'startTokenPos', 'endTokenPos',
-            ],
-        ]);
-        $parser = new Php7($lexer);
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new CloningVisitor());
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $traverser = new NodeTraverser(new CloningVisitor());
         $oldStmts = $parser->parse($this->code);
-        $oldTokens = $lexer->getTokens();
+        $oldTokens = $parser->getTokens();
         $newStmts = $traverser->traverse($oldStmts);
 
         // Capture the original code
