@@ -224,7 +224,7 @@ PHP;
     public function modifyCode(NodeVisitorInterface $visitor): bool
     {
         // Format-preserving pretty printing setup
-        // see https://github.com/nikic/PHP-Parser/blob/4.x/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
+        // see https://github.com/nikic/PHP-Parser/blob/v5.4.0/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
         $parser = (new ParserFactory())->createForHostVersion();
         $traverser = new NodeTraverser(new CloningVisitor());
         $oldStmts = $parser->parse($this->code);
