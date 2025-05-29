@@ -128,7 +128,7 @@ abstract class Code
      */
     public static function parseSnippet(string $snippet): array
     {
-        $parser = (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
+        $parser = (new ParserFactory())->createForHostVersion();
         return $parser->parse("<?php\n$snippet") ?? [];
     }
 

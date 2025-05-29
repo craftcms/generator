@@ -819,7 +819,7 @@ abstract class BaseGenerator extends BaseObject
      * @param string $eventClass The event class that will be passed.
      * @param string $eventProperty The property to register the component to.
      * @return bool Whether an `attachEventHandlers()` method could be found.
-     * @see https://github.com/nikic/PHP-Parser/blob/4.x/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
+     * @see https://github.com/nikic/PHP-Parser/blob/v5.4.0/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
      */
     protected function addRegistrationEventHandlerCode(
         string $class,
