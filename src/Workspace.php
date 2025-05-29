@@ -225,7 +225,7 @@ PHP;
     {
         // Format-preserving pretty printing setup
         // see https://github.com/nikic/PHP-Parser/blob/4.x/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory())->createForHostVersion();
         $traverser = new NodeTraverser(new CloningVisitor());
         $oldStmts = $parser->parse($this->code);
         $oldTokens = $parser->getTokens();
