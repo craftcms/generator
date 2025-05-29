@@ -1,5 +1,8 @@
 # Release Notes for Craft Generator
 
+## Unreleased
+- Updated nikic/php-parser to v5. ([#40](https://github.com/craftcms/generator/pull/40))
+
 ## 2.1.0 - 2024-06-19
 - Generated plugins and modules now call `$this->attachEventHandlers()` directly from `init()`, and clarify when `onInit()` should be used.
 
