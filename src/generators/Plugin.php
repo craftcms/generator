@@ -11,7 +11,6 @@ use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Craft;
 use craft\base\Model;
-use craft\base\Plugin as BasePlugin;
 use craft\generator\BaseGenerator;
 use craft\generator\helpers\Code;
 use craft\helpers\ArrayHelper;
@@ -19,6 +18,10 @@ use craft\helpers\Console;
 use craft\helpers\FileHelper;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
+use CraftCms\Cms\Component\Contracts\ValidatableComponentInterface;
+use CraftCms\Cms\Plugin\Plugin as BasePlugin;
+use CraftCms\Cms\Plugin\PluginSettings;
+use CraftCms\Cms\Support\Str;
 use GuzzleHttp\Exception\RequestException;
 use Nette\PhpGenerator\PhpFile;
 use yii\validators\EmailValidator;
@@ -202,13 +205,16 @@ EOD));
         ]);
 
         $this->rootNamespace = $this->namespacePrompt('Root namespace:', [
-            'default' => Code::normalizeClass(str_replace('-', '', $this->packageName)),
+            'default' => Code::normalizeClass(
+                collect(explode('/', $this->packageName))
+                    ->map(fn(string $str) => Str::pascal($str))
+                    ->implode('/')
+            ),
         ]);
 
         $this->hasSettings = $this->command->confirm('Should the plugin have settings?');
 
         if ($this->hasSettings) {
-            $this->settingsNamespace = "$this->rootNamespace\\models";
             $this->settingsClassName = 'Settings';
         }
 
@@ -249,7 +255,7 @@ EOD));
 
         // Settings
         if ($this->hasSettings) {
-            $this->writeSettingsModel();
+            $this->writeSettingsClass();
             $this->writeSettingsTemplate();
         }
 
@@ -395,16 +401,15 @@ YAML;
             ->addUse(BasePlugin::class, $this->className === 'Plugin' ? 'BasePlugin' : null);
 
         if ($this->hasSettings) {
-            $namespace->addUse(Model::class);
-            $namespace->addUse("$this->settingsNamespace\\$this->settingsClassName");
+            $namespace->addUse(ValidatableComponentInterface::class);
+            $namespace->addUse(PluginSettings::class);
+            $namespace->addUse("$this->rootNamespace\\$this->settingsClassName");
         }
 
         $class = $this->createClass($this->className, BasePlugin::class, [
             self::CLASS_PROPERTIES => $this->pluginProperties(),
             self::CLASS_METHODS => $this->pluginMethods(),
         ]);
-        $class->getMethod('init')
-            ->setReturnType('void');
         $namespace->add($class);
 
         $class->setComment(<<<EOD
@@ -422,14 +427,6 @@ EOD);
             $class->addComment("@copyright $this->developer");
             $class->addComment(sprintf('@license %s', $this->license === 'mit' ? 'MIT' : 'https://craftcms.github.io/license/ Craft License'));
         }
-
-        $class->addMethod('attachEventHandlers')
-            ->setPrivate()
-            ->setReturnType('void')
-            ->setBody(<<<EOD
-// Register event handlers here ...
-// (see https://craftcms.com/docs/5.x/extend/events.html to get started)
-EOD);
 
         $this->writePhpFile("$this->targetDir/src/$this->className.php", $file);
     }
@@ -709,26 +706,8 @@ NEON;
     private function pluginMethods(): array
     {
         return array_filter([
-            'config' => <<<PHP
-return [
-    'components' => [
-        // Define component configs here...
-    ],
-];
-PHP,
-            'init' => <<<PHP
-parent::init();
-
-\$this->attachEventHandlers();
-
-// Any code that creates an element query or loads Twig should be deferred until
-// after Craft is fully initialized, to avoid conflicts with other plugins/modules
-Craft::\$app->onInit(function() {
-    // ...
-});
-PHP,
             'createSettingsModel' => $this->hasSettings
-                ? 'return Craft::createObject(Settings::class);'
+                ? 'return new Settings;'
                 : null,
             'settingsHtml' => $this->hasSettings
                 ? <<<PHP
@@ -741,27 +720,26 @@ PHP
         ]);
     }
 
-    private function writeSettingsModel(): void
+    private function writeSettingsClass(): void
     {
         $file = new PhpFile();
         $file->setStrictTypes($this->command->withStrictTypes);
 
-        $namespace = $file->addNamespace($this->settingsNamespace)
-            ->addUse(Craft::class)
-            ->addUse(Model::class);
+        $namespace = $file->addNamespace($this->rootNamespace)
+            ->addUse(PluginSettings::class);
 
-        $class = $this->createClass('Settings', Model::class);
+        $class = $this->createClass('Settings', PluginSettings::class);
         $namespace->add($class);
 
         $class->setComment("$this->name settings");
 
-        $this->writePhpFile("$this->targetDir/src/models/Settings.php", $file);
+        $this->writePhpFile("$this->targetDir/src/Settings.php", $file);
     }
 
     private function writeSettingsTemplate(): void
     {
         $pluginClass = "\\$this->rootNamespace\\$this->className";
-        $settingsClass = "\\$this->settingsNamespace\\$this->settingsClassName";
+        $settingsClass = "\\$this->rootNamespace\\$this->settingsClassName";
         $contents = <<<TWIG
 {# @var plugin $pluginClass #}
 {# @var settings $settingsClass #}
