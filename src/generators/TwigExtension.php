@@ -49,7 +49,7 @@ class TwigExtension extends BaseGenerator
         $message = '**Twig extension created!**';
         if (
             $this->plugin &&
-            !$this->addRegistrationCode($fallbackExample)
+            !$this->addExtensionRegistrationCode($fallbackExample)
         ) {
             $pluginFile = $this->pluginFile();
             $message .= "\n" . <<<MD
@@ -118,7 +118,7 @@ PHP,
         ];
     }
 
-    private function addRegistrationCode(?string &$fallbackExample = null): bool
+    private function addExtensionRegistrationCode(?string &$fallbackExample = null): bool
     {
         $file = $this->findPluginMethod('init');
         if (!$file) {

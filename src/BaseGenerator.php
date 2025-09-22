@@ -21,6 +21,8 @@ use Nette\PhpGenerator\Factory;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
+use PhpParser\Node;
+use PhpParser\NodeTraverser;
 use ReflectionClass;
 use ReflectionClassConstant;
 use ReflectionException;
@@ -789,6 +791,74 @@ abstract class BaseGenerator extends BaseObject
         }
 
         return $this->modifyFile($this->pluginFile(), $callback);
+    }
+
+    /**
+     * Adds component registration code to a class.
+     *
+     * @param string $property The property to register the component with
+     * @param string $componentClass The component class to attach to [[RegisterComponentTypesEvent::$types]]
+     * @return bool Whether an `attachEventHandlers()` method could be found.
+     */
+    protected function addRegistrationCode(
+        string $property,
+        string $componentClass,
+    ): bool {
+        if (!$this->plugin) {
+            return false;
+        }
+
+        $file = new ReflectionClass($this->plugin)->getFileName();
+
+        $this->modifyFile($file, function(Workspace $workspace) use ($property, $componentClass) {
+            $startLine = $endLine = null;
+
+            $workspace->modifyCode(new NodeVisitor(
+                enterNode: function(Node $node) use ($workspace, $property, &$startLine, &$endLine) {
+                    if ($node instanceof Node\Stmt\Property && ($node->props[0]->name->name ?? null) === $property) {
+                        $startLine = $node->getAttribute('startLine');
+                        $endLine = $node->getAttribute('endLine');
+                        return NodeTraverser::STOP_TRAVERSAL;
+                    }
+                }
+            ));
+
+            if ($startLine !== null) {
+                $ref = new ReflectionProperty($this->plugin, $property);
+                $allValues = $ref->getValue($this->plugin);
+            } else {
+                $allValues = [];
+            }
+
+            $code = "    protected array \$$property = [\n";
+            foreach ($allValues as $value) {
+                $code .= "        '$value',\n";
+            }
+            $code .= "        '$componentClass',\n";
+            $code .= "    ];";
+
+            $file = new ReflectionClass($this->plugin)->getFileName();
+            $php = file_get_contents($file);
+
+            if ($startLine) {
+                $lines = explode("\n", $php);
+                $php = implode("\n", [
+                    ...array_slice($lines, 0, $startLine - 1),
+                    $code,
+                    ...array_slice($lines, $endLine)
+                ]);
+            } else {
+                $rdPos = strrpos($php, '}');
+                $lastLinePos = strrpos($php, "\n", $rdPos - strlen($php)) ?: $rdPos;
+                $php = substr($php, 0, $lastLinePos) . "\n\n$code" . substr($php, $lastLinePos);
+            }
+
+            file_put_contents($file, $php);
+
+            return false;
+        });
+
+        return true;
     }
 
     /**

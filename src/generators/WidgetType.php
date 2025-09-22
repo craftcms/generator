@@ -7,10 +7,8 @@
 
 namespace craft\generator\generators;
 
-use Craft;
-use craft\base\Widget;
 use craft\generator\BaseGenerator;
-use craft\services\Dashboard;
+use CraftCms\Cms\Dashboard\Widgets\Widget;
 use Nette\PhpGenerator\PhpNamespace;
 use yii\helpers\Inflector;
 
@@ -32,13 +30,12 @@ class WidgetType extends BaseGenerator
         ]);
 
         $this->namespace = $this->namespacePrompt('Widget type namespace:', [
-            'default' => "$this->baseNamespace\\widgets",
+            'default' => "$this->baseNamespace\\Widgets",
         ]);
 
         $this->displayName = Inflector::camel2words($this->className);
 
-        $namespace = (new PhpNamespace($this->namespace))
-            ->addUse(Craft::class)
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Widget::class);
 
         $class = $this->createClass($this->className, Widget::class, [
@@ -49,28 +46,9 @@ class WidgetType extends BaseGenerator
         $class->setComment("$this->displayName widget type");
 
         $this->writePhpClass($namespace);
+        $this->addRegistrationCode('widgets', "$this->namespace\\$this->className");
 
-        $message = "**Widget type created!**";
-        if (
-            $this->plugin &&
-            !$this->addRegistrationEventHandlerCode(
-                Dashboard::class,
-                'EVENT_REGISTER_WIDGET_TYPES',
-                "$this->namespace\\$this->className",
-                $fallbackExample,
-            )
-        ) {
-            $pluginFile = $this->pluginFile();
-            $message .= "\n" . <<<MD
-Add the following code to `$pluginFile` to register the widget type:
-
-```
-$fallbackExample
-```
-MD;
-        }
-
-        $this->command->success($message);
+        $this->command->success("**Widget type created!**");
         return true;
     }
 
