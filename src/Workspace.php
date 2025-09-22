@@ -225,7 +225,7 @@ PHP;
     {
         // Format-preserving pretty printing setup
         // see https://github.com/nikic/PHP-Parser/blob/v5.4.0/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
-        $parser = (new ParserFactory())->createForHostVersion();
+        $parser = new ParserFactory()->createForHostVersion();
         $traverser = new NodeTraverser(new CloningVisitor());
         $oldStmts = $parser->parse($this->code);
         $oldTokens = $parser->getTokens();
@@ -282,7 +282,7 @@ PHP;
     public function appendCodeToClass(Method|string $code): bool
     {
         if ($code instanceof Method) {
-            $method = (new PsrPrinter())->printMethod($code);
+            $method = new PsrPrinter()->printMethod($code);
             $code = <<<PHP
 class Foo {
     $method

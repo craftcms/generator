@@ -8,13 +8,13 @@
 namespace craft\generator;
 
 use Craft;
-use craft\base\PluginInterface;
 use craft\events\RegisterComponentTypesEvent;
 use craft\generator\helpers\Code;
 use craft\generator\helpers\Composer;
 use craft\helpers\FileHelper;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
+use CraftCms\Cms\Plugin\Contracts\PluginInterface;
 use Generator;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Factory;
@@ -30,7 +30,6 @@ use yii\base\Application;
 use yii\base\BaseObject;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
-use yii\base\Module;
 use yii\base\NotSupportedException;
 
 /**
@@ -81,9 +80,9 @@ abstract class BaseGenerator extends BaseObject
     public Command $command;
 
     /**
-     * @var Module|null The module that the generator is working with, if not the Craft project itself.
+     * @var PluginInterface|null The plugin that the generator is working with, if not the Craft project itself.
      */
-    public ?Module $module;
+    public ?PluginInterface $plugin;
 
     /**
      * @var string The base path that the generator is working with.
@@ -93,7 +92,7 @@ abstract class BaseGenerator extends BaseObject
     /**
      * @var string|null The base namespace that the generator is working with.
      *
-     * This will be set for all module and plugin component generators.
+     * This will be set for all plugin component generators.
      */
     public ?string $baseNamespace;
 
@@ -110,29 +109,18 @@ abstract class BaseGenerator extends BaseObject
     abstract public function run(): bool;
 
     /**
-     * Returns whether the generator is being run for a plugin or module.
-     *
-     * @return bool
-     * @since 1.1.0
-     */
-    protected function isForModule(): bool
-    {
-        return $this->module && !$this->module instanceof Application;
-    }
-
-    /**
-     * Returns the module’s file path.
+     * Returns the plugin’s file path.
      *
      * @return string
-     * @throws InvalidConfigException if no [[module]] is set
+     * @throws InvalidConfigException if no [[plugin]] is set
      */
-    protected function moduleFile(): string
+    protected function pluginFile(): string
     {
-        if (!$this->module) {
-            throw new InvalidConfigException('No module is set for the generator.');
+        if (!$this->plugin) {
+            throw new InvalidConfigException('No plugin is set for the generator.');
         }
 
-        return (new ReflectionClass($this->module))->getFileName();
+        return new ReflectionClass($this->plugin)->getFileName();
     }
 
     /**
@@ -197,7 +185,7 @@ abstract class BaseGenerator extends BaseObject
     }
 
     /**
-     * Prompts the user for an ID, such as a module ID or action name (kebab-case).
+     * Prompts the user for an ID, such as a plugin handle or action name (kebab-case).
      *
      * @param string $text The prompt text
      * @param array $options Prompt options:
@@ -513,7 +501,7 @@ abstract class BaseGenerator extends BaseObject
                 }
                 /** @var ReflectionClassConstant $constantRef */
                 $constantRef = $this->findRef($subClasses, fn(string $subClass) => new ReflectionClassConstant($subClass, $constantName));
-                $constant = (new Factory())->fromConstantReflection($constantRef);
+                $constant = new Factory()->fromConstantReflection($constantRef);
                 $constant->setComment($this->docBlock($constantRef));
                 if ($setValue) {
                     $constant->setValue($constantValue);
@@ -532,7 +520,7 @@ abstract class BaseGenerator extends BaseObject
                 }
                 /** @var ReflectionProperty $propertyRef */
                 $propertyRef = $this->findRef($subClasses, fn(string $subClass) => new ReflectionProperty($subClass, $propertyName));
-                $property = (new Factory())->fromPropertyReflection($propertyRef);
+                $property = new Factory()->fromPropertyReflection($propertyRef);
                 $property->setComment($this->docBlock($propertyRef));
                 if ($setValue) {
                     $property->setValue($propertyValue);
@@ -551,7 +539,7 @@ abstract class BaseGenerator extends BaseObject
                 }
                 /** @var ReflectionMethod $methodRef */
                 $methodRef = $this->findRef($subClasses, fn(string $subClass) => new ReflectionMethod($subClass, $methodName));
-                $method = (new Factory())->fromMethodReflection($methodRef);
+                $method = new Factory()->fromMethodReflection($methodRef);
                 $method->setAbstract(false);
                 $method->setComment($this->docBlock($methodRef));
                 if ($setBody) {
@@ -680,7 +668,7 @@ abstract class BaseGenerator extends BaseObject
      */
     protected function writePhpFile(string $file, PhpFile $phpFile): void
     {
-        $this->command->writeToFile($file, (new PsrPrinter())->printFile($phpFile));
+        $this->command->writeToFile($file, new PsrPrinter()->printFile($phpFile));
     }
 
     /**
@@ -757,22 +745,17 @@ abstract class BaseGenerator extends BaseObject
     }
 
     /**
-     * Resolves an appropriate translation category for the target module/component.
+     * Resolves an appropriate translation category for the target plugin/component.
      *
      * The result is not guaranteed to be valid:
-     * - Modules can register translation categories with any handle/ID they like (and the ID of a module can change at any time);
      * - Plugins may register additional translation categories (non-standard) that we don’t/can’t know about;
-     * - The `site` translation category used by the front-end (and some modules) is not taken into consideration;
+     * - The `site` translation category used by the front-end is not taken into consideration;
      *
      * @return string|null Translation category handle
      */
     private function translationCategory(): ?string
     {
-        return match (true) {
-            $this->module instanceof Application => 'app',
-            $this->module instanceof PluginInterface => $this->module->id,
-            default => null,
-        };
+        return $this->plugin->handle ?? null;
     }
 
     /**
@@ -794,22 +777,22 @@ abstract class BaseGenerator extends BaseObject
     }
 
     /**
-     * Modifies the module class.
+     * Modifies the plugin class.
      *
      * @param callable $callback
      * @return bool Whether any code was changed.
      */
-    protected function modifyModuleFile(callable $callback): bool
+    protected function modifyPluginFile(callable $callback): bool
     {
-        if (!$this->module) {
+        if (!$this->plugin) {
             return false;
         }
 
-        return $this->modifyFile($this->moduleFile(), $callback);
+        return $this->modifyFile($this->pluginFile(), $callback);
     }
 
     /**
-     * Adds component registration event code to the module’s `attachEventHandlers()` method, if it has one.
+     * Adds component registration event code to the plugin’s `attachEventHandlers()` method, if it has one.
      *
      * @param string $class The class that triggers the registration event
      * @param string $event The registration event constant name
@@ -831,7 +814,7 @@ abstract class BaseGenerator extends BaseObject
         string $eventProperty = 'types',
     ): bool {
         foreach (['attachEventHandlers', 'init'] as $method) {
-            $file = $this->findModuleMethod($method);
+            $file = $this->findPluginMethod($method);
             if ($file) {
                 return $this->modifyFile($file, function(Workspace $workspace) use (
                     $class,
@@ -859,26 +842,26 @@ abstract class BaseGenerator extends BaseObject
     }
 
     /**
-     * Returns the file path that defines the given module method, if the method exists and is defined within
-     * the module’s base path.
+     * Returns the file path that defines the given plugin method, if the method exists and is defined within
+     * the plugin’s base path.
      *
      * @param string $method
      * @return string|false
      * @since 1.0.2
      */
-    protected function findModuleMethod(string $method): string|false
+    protected function findPluginMethod(string $method): string|false
     {
-        if (!$this->module) {
+        if (!$this->plugin) {
             return false;
         }
 
         try {
-            $file = (new ReflectionMethod($this->module, $method))->getFileName();
+            $file = new ReflectionMethod($this->plugin, $method)->getFileName();
         } catch (ReflectionException) {
             return false;
         }
 
-        if (!FileHelper::isWithin($file, $this->module->getBasePath())) {
+        if (!FileHelper::isWithin($file, $this->plugin->getBasePath())) {
             return false;
         }
 

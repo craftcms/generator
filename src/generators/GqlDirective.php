@@ -43,7 +43,7 @@ class GqlDirective extends BaseGenerator
         $this->className = Inflector::camelize($this->name);
         $this->displayName = Inflector::camel2words($this->name);
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(Directive::class)
             ->addUse(BaseGqlDirective::class, 'GqlDirective')
@@ -64,7 +64,7 @@ class GqlDirective extends BaseGenerator
 
         $message = '**Directive created!**';
         if (
-            $this->isForModule() &&
+            $this->plugin &&
             !$this->addRegistrationEventHandlerCode(
                 Gql::class,
                 'EVENT_REGISTER_GQL_DIRECTIVES',
@@ -74,9 +74,9 @@ class GqlDirective extends BaseGenerator
                 eventProperty: 'directives',
             )
         ) {
-            $moduleFile = $this->moduleFile();
+            $pluginFile = $this->pluginFile();
             $message .= "\n" . <<<MD
-Add the following code to `$moduleFile` to register the directive:
+Add the following code to `$pluginFile` to register the directive:
 
 ```
 $fallbackExample

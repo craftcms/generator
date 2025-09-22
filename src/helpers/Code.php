@@ -128,7 +128,7 @@ abstract class Code
      */
     public static function parseSnippet(string $snippet): array
     {
-        $parser = (new ParserFactory())->createForHostVersion();
+        $parser = new ParserFactory()->createForHostVersion();
         return $parser->parse("<?php\n$snippet") ?? [];
     }
 
@@ -151,6 +151,6 @@ abstract class Code
      */
     public static function printSnippet(array $stmts): string
     {
-        return preg_replace('/^<\?php\s*/', '', (new Standard())->prettyPrint($stmts));
+        return preg_replace('/^<\?php\s*/', '', new Standard()->prettyPrint($stmts));
     }
 }

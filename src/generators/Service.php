@@ -50,7 +50,7 @@ class Service extends BaseGenerator
         $this->displayName = Inflector::camel2words($this->className);
         $this->componentId = lcfirst($this->className);
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(Component::class);
 
@@ -63,10 +63,10 @@ class Service extends BaseGenerator
 
         $message = "**Service created!**";
         if (
-            $this->isForModule() &&
+            $this->plugin &&
             (
-                !$this->module instanceof PluginInterface ||
-                ($file = $this->findModuleMethod('config')) === false ||
+                !$this->plugin instanceof PluginInterface ||
+                ($file = $this->findPluginMethod('config')) === false ||
                 !$this->modifyFile($file, function(Workspace $workspace) {
                     $serviceClassName = $workspace->importClass("$this->namespace\\$this->className");
 
@@ -100,13 +100,12 @@ class Service extends BaseGenerator
             )
         ) {
             $message .= "\n";
-            $moduleClass = '\\' . get_class($this->module);
+            $pluginClass = '\\' . get_class($this->plugin);
             $serviceClass = '\\' . $this->namespace . '\\' . $this->className;
 
-            if ($this->module instanceof PluginInterface) {
-                $moduleFile = $this->moduleFile();
-                $message .= <<<MD
-Add the following code to `$moduleFile` to register the service:
+            $pluginFile = $this->pluginFile();
+            $message .= <<<MD
+Add the following code to `$pluginFile` to register the service:
 
 ```
 use $this->namespace\\$this->className;
@@ -121,25 +120,9 @@ public static function config(): array
 }
 ```
 MD;
-            } else {
-                $message .= <<<MD
-Add `$this->componentId` to the module’s definition in `config/app.php` to register the service:
-
-```
-'modules' => [
-    '{$this->module->id}' => [
-        'class' => $moduleClass::class,
-        'components' => [
-            '$this->componentId' => $serviceClass::class,
-        ],
-    ],
-],
-```
-MD;
-            }
 
             $message .= "\n\n" . <<<MD
-You should also add a `@property-read` tag to the $moduleClass class’s DocBlock comment, to help with IDE autocompletion:
+You should also add a `@property-read` tag to the $pluginClass class’s DocBlock comment, to help with IDE autocompletion:
 
 ```
 /**

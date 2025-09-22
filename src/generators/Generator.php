@@ -62,7 +62,7 @@ class Generator extends BaseGenerator
             'default' => str_replace(' ', '', $pluralLowerDisplayName),
         ]);
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(BaseGenerator::class)
             ->addUse(Inflector::class)
@@ -132,7 +132,7 @@ PHP);
 
         $message = "**$this->ucfirstDisplayName generator created!**";
         if (
-            $this->isForModule() &&
+            $this->plugin &&
             !$this->addRegistrationEventHandlerCode(
                 CommandCommand::class,
                 'EVENT_REGISTER_GENERATORS',
@@ -141,9 +141,9 @@ PHP);
                 true,
             )
         ) {
-            $moduleFile = $this->moduleFile();
+            $pluginFile = $this->pluginFile();
             $message .= "\n" . <<<MD
-Register it for Craft’s `make` command by adding the following code to `$moduleFile`:
+Register it for Craft’s `make` command by adding the following code to `$pluginFile`:
 
 ```
 $fallbackExample

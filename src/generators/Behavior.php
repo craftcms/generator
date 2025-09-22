@@ -43,7 +43,7 @@ class Behavior extends BaseGenerator
                     $error = "$class does not exist.";
                     return false;
                 }
-                if (!(new ReflectionClass($class))->hasConstant('EVENT_DEFINE_BEHAVIORS')) {
+                if (!new ReflectionClass($class)->hasConstant('EVENT_DEFINE_BEHAVIORS')) {
                     $error = "$class doesn’t define an EVENT_DEFINE_BEHAVIORS event.";
                     return false;
                 }
@@ -53,7 +53,7 @@ class Behavior extends BaseGenerator
 
         $this->displayName = Inflector::camel2words($this->className);
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(BaseBehavior::class);
 
         // `use` the class we want to target to make events and docblocks easier to grok:
@@ -83,7 +83,7 @@ class Behavior extends BaseGenerator
 
         if (
             $this->targetClass &&
-            $this->isForModule() &&
+            $this->plugin &&
             !$this->addRegistrationEventHandlerCode(
                 $this->targetClass,
                 'EVENT_DEFINE_BEHAVIORS',
@@ -94,9 +94,9 @@ class Behavior extends BaseGenerator
                 'behaviors',
             )
         ) {
-            $moduleFile = $this->moduleFile();
+            $pluginFile = $this->pluginFile();
             $message .= "\n" . <<<MD
-Add the following code to `$moduleFile` to attach your new behavior to all instances of `$this->targetClass`:
+Add the following code to `$pluginFile` to attach your new behavior to all instances of `$this->targetClass`:
 
 ```
 $fallbackExample

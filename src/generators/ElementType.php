@@ -77,8 +77,8 @@ class ElementType extends BaseGenerator
         $this->writeIndexTemplate();
 
         $message = '**Element type created!**';
-        if ($this->isForModule()) {
-            $moduleFile = $this->moduleFile();
+        if ($this->plugin) {
+            $pluginFile = $this->pluginFile();
 
             if (!$this->addRegistrationEventHandlerCode(
                 Elements::class,
@@ -87,7 +87,7 @@ class ElementType extends BaseGenerator
                 $fallbackExample,
             )) {
                 $message .= "\n" . <<<MD
-Add the following code to `$moduleFile` to register the element type:
+Add the following code to `$pluginFile` to register the element type:
 
 ```
 $fallbackExample
@@ -97,9 +97,9 @@ MD;
             }
 
             $fallbackExample = null;
-            if (!$this->modifyModuleFile(function(Workspace $workspace) use (&$fallbackExample) {
+            if (!$this->modifyPluginFile(function(Workspace $workspace) use (&$fallbackExample) {
                 $handlerCode = <<<PHP
-\$event->rules['$this->pluralKebabCasedName'] = ['template' => '{$this->module->id}/$this->pluralKebabCasedName/_index.twig'];
+\$event->rules['$this->pluralKebabCasedName'] = ['template' => '{$this->plugin->handle}/$this->pluralKebabCasedName/_index.twig'];
 \$event->rules['$this->pluralKebabCasedName/<elementId:\d+>'] = 'elements/edit';
 PHP;
                 $eventCode = $workspace->prepareEventHandlerCode(
@@ -117,7 +117,7 @@ PHP;
                 return true;
             })) {
                 $message .= "\n" . <<<MD
-Add the following code to `$moduleFile` to register URL rules for the element index and edit pages:
+Add the following code to `$pluginFile` to register URL rules for the element index and edit pages:
 
 ```
 $fallbackExample
@@ -132,7 +132,7 @@ MD;
 
     private function writeElementClass(): void
     {
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(BaseElement::class)
             ->addUse(CpScreenResponseBehavior::class)
             ->addUse(Craft::class)
@@ -315,7 +315,7 @@ PHP,
 
     private function writeQueryClass(): void
     {
-        $namespace = (new PhpNamespace($this->queryNamespace))
+        $namespace = new PhpNamespace($this->queryNamespace)
             ->addUse(Craft::class)
             ->addUse(ElementQuery::class);
 
@@ -346,7 +346,7 @@ PHP,
 
     private function writeConditionClass(): void
     {
-        $namespace = (new PhpNamespace($this->conditionNamespace))
+        $namespace = new PhpNamespace($this->conditionNamespace)
             ->addUse(Craft::class)
             ->addUse(ElementCondition::class);
 

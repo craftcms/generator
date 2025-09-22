@@ -91,7 +91,7 @@ class ElementConditionRule extends BaseGenerator
 
         $this->displayName = Inflector::camel2words($this->className);
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(ElementConditionRuleInterface::class)
             ->addUse(ElementInterface::class)
@@ -138,7 +138,7 @@ PHP,
 // Match the element based on one of its attributes
 // return \$this->matchValue(\$element->myAttribute);
 PHP,
-            'options' => (new ReflectionClass($this->baseClass))->hasMethod('options')
+            'options' => new ReflectionClass($this->baseClass)->hasMethod('options')
                 ? <<<PHP
 // Return the selectable options
 return [

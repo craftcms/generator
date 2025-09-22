@@ -38,7 +38,7 @@ class FilesystemType extends BaseGenerator
 
         $this->displayName = Inflector::camel2words($this->className);
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(Fs::class)
             ->addUse(FsListing::class);
@@ -54,7 +54,7 @@ class FilesystemType extends BaseGenerator
 
         $message = "**Filesystem type created!**";
         if (
-            $this->isForModule() &&
+            $this->plugin &&
             !$this->addRegistrationEventHandlerCode(
                 FsService::class,
                 'EVENT_REGISTER_FILESYSTEM_TYPES',
@@ -62,9 +62,9 @@ class FilesystemType extends BaseGenerator
                 $fallbackExample,
             )
         ) {
-            $moduleFile = $this->moduleFile();
+            $pluginFile = $this->pluginFile();
             $message .= "\n" . <<<MD
-Add the following code to `$moduleFile` to register the filesystem type:
+Add the following code to `$pluginFile` to register the filesystem type:
 
 ```
 $fallbackExample

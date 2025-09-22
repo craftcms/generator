@@ -30,7 +30,7 @@ class TwigExtension extends BaseGenerator
             'default' => "$this->baseNamespace\\web\\twig",
         ]);
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(AbstractExtension::class)
             ->addUse(TwigFilter::class)
@@ -48,13 +48,12 @@ class TwigExtension extends BaseGenerator
 
         $message = '**Twig extension created!**';
         if (
-            $this->isForModule() &&
-            !$this->
-            addRegistrationCode($fallbackExample)
+            $this->plugin &&
+            !$this->addRegistrationCode($fallbackExample)
         ) {
-            $moduleFile = $this->moduleFile();
+            $pluginFile = $this->pluginFile();
             $message .= "\n" . <<<MD
-Add the following code to `$moduleFile` to register the Twig extension:
+Add the following code to `$pluginFile` to register the Twig extension:
 
 ```
 $fallbackExample
@@ -121,7 +120,7 @@ PHP,
 
     private function addRegistrationCode(?string &$fallbackExample = null): bool
     {
-        $file = $this->findModuleMethod('init');
+        $file = $this->findPluginMethod('init');
         if (!$file) {
             return false;
         }

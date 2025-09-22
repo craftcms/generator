@@ -39,7 +39,7 @@ class Utility extends BaseGenerator
         $this->displayName = Inflector::camel2words($this->className);
         $this->utilityId = Inflector::camel2id($this->className);
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(BaseUtility::class);
 
@@ -54,7 +54,7 @@ class Utility extends BaseGenerator
 
         $message = "**Utility created!**";
         if (
-            $this->isForModule() &&
+            $this->plugin &&
             !$this->addRegistrationEventHandlerCode(
                 Utilities::class,
                 'EVENT_REGISTER_UTILITIES',
@@ -62,9 +62,9 @@ class Utility extends BaseGenerator
                 $fallbackExample,
             )
         ) {
-            $moduleFile = $this->moduleFile();
+            $pluginFile = $this->pluginFile();
             $message .= "\n" . <<<MD
-Add the following code to `$moduleFile` to register the utility:
+Add the following code to `$pluginFile` to register the utility:
 
 ```
 $fallbackExample

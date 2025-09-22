@@ -40,7 +40,7 @@ class Controller extends BaseGenerator
         ]);
         $ns = Code::normalizeClass(sprintf('%s\\%s', $ns, implode('\\', $idParts)));
 
-        $namespace = (new PhpNamespace($ns))
+        $namespace = new PhpNamespace($ns)
             ->addUse(Craft::class)
             ->addUse(BaseController::class)
             ->addUse(Response::class);
@@ -52,7 +52,7 @@ class Controller extends BaseGenerator
 
         $class->setComment(sprintf('%s controller', StringHelper::toTitleCase(str_replace('-', ' ', $id))));
 
-        $uniqueId = $this->module instanceof Application ? $id : sprintf('%s/%s', $this->module->getUniqueId(), $id);
+        $uniqueId = $this->plugin instanceof Application ? $id : sprintf('%s/%s', $this->plugin->getUniqueId(), $id);
         $class->addMethod('actionIndex')
             ->setPublic()
             ->setReturnType(Response::class)

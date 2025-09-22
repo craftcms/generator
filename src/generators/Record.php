@@ -43,7 +43,7 @@ class Record extends BaseGenerator
             'required' => true,
             'pattern' => '/^\w+$/',
             'default' => sprintf('%s%s',
-                $this->isForModule() ? "{$this->module->id}_" : '',
+                $this->plugin ? "{$this->plugin->handle}_" : '',
                 strtolower(Inflector::pluralize($this->className)
             )),
         ]);
@@ -60,7 +60,7 @@ class Record extends BaseGenerator
             $softDeletable = $this->command->confirm('Will instances be soft-deletable? (requires a `dateDeleted` column)');
         }
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(ActiveRecord::class);
 

@@ -52,7 +52,7 @@ class WidgetType extends BaseGenerator
 
         $message = "**Widget type created!**";
         if (
-            $this->isForModule() &&
+            $this->plugin &&
             !$this->addRegistrationEventHandlerCode(
                 Dashboard::class,
                 'EVENT_REGISTER_WIDGET_TYPES',
@@ -60,9 +60,9 @@ class WidgetType extends BaseGenerator
                 $fallbackExample,
             )
         ) {
-            $moduleFile = $this->moduleFile();
+            $pluginFile = $this->pluginFile();
             $message .= "\n" . <<<MD
-Add the following code to `$moduleFile` to register the widget type:
+Add the following code to `$pluginFile` to register the widget type:
 
 ```
 $fallbackExample

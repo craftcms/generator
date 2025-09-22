@@ -43,7 +43,7 @@ class AssetBundle extends BaseGenerator
 
         $this->displayName = Inflector::camel2words(StringHelper::removeRight($this->className, 'Asset'));
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(BaseAssetBundle::class);
 

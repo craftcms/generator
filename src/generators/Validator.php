@@ -36,7 +36,7 @@ class Validator extends BaseGenerator
 
         $this->displayName = Inflector::camel2words($this->className);
 
-        $namespace = (new PhpNamespace($this->namespace))
+        $namespace = new PhpNamespace($this->namespace)
             ->addUse(Craft::class)
             ->addUse(BaseValidator::class);
 

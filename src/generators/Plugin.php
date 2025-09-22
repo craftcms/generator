@@ -152,7 +152,7 @@ EOD));
 
             $this->email = $this->command->prompt('Support email:', [
                 'validator' => fn(string $input, ?string & $error) =>
-                    (new EmailValidator())->validate($input, $error) &&
+                    new EmailValidator()->validate($input, $error) &&
                     StringHelper::isUtf8($input),
             ]);
 

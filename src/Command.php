@@ -70,11 +70,6 @@ class Command extends Controller
     private bool $_app = false;
 
     /**
-     * @var string|null The module ID to generate the component for.
-     */
-    private ?string $_module = null;
-
-    /**
      * @var string|null The plugin handle to generate the component for.
      */
     private ?string $_plugin = null;
@@ -89,7 +84,7 @@ class Command extends Controller
      */
     public function options($actionID): array
     {
-        // Don't include app/module/plugin since `module` conflicts with yii\base\Controller::$module
+        // Don't include app/plugin
         return array_merge(parent::options($actionID), [
             'withDocblocks',
             'withStrictTypes',
@@ -112,11 +107,6 @@ class Command extends Controller
                 'default' => null,
                 'comment' => 'The base source path to generate the component in',
             ],
-            'module' => [
-                'type' => 'string|null',
-                'default' => null,
-                'comment' => 'The module ID to generate the component for.',
-            ],
             'plugin' => [
                 'type' => 'string|null',
                 'default' => null,
@@ -131,7 +121,6 @@ class Command extends Controller
     public function runAction($id, $params = []): int
     {
         $this->_app = (bool)(ArrayHelper::remove($params, 'app') ?? false);
-        $this->_module = ArrayHelper::remove($params, 'module');
         $this->_plugin = ArrayHelper::remove($params, 'plugin');
         $this->_path = ArrayHelper::remove($params, 'path');
 
@@ -141,10 +130,9 @@ class Command extends Controller
     /**
      * Generates the scaffolding for a new system component.
      *
-     * All commands other than `make module` and `make plugin` require one of the following options to be passed:
+     * All commands other than `make plugin` require one of the following options to be passed:
      *
      * - `--app`
-     * - `--module=<module-id>`
      * - `--plugin=<plugin-handle>`
      *
      * If `--with-docblocks` is passed, generated classes will include DocBlock comments copied from their base class.
@@ -164,15 +152,14 @@ class Command extends Controller
 
         $usedParams = array_filter([
             $this->_app ? '--app' : null,
-            $this->_module ? '--module' : null,
             $this->_plugin ? '--plugin' : null,
             $this->_path ? '--path' : null,
         ]);
         $usedParamCount = count($usedParams);
 
-        $module = null;
+        $plugin = null;
 
-        if (in_array($type, ['module', 'plugin'])) {
+        if ($type === 'plugin') {
             if ($usedParamCount !== 0) {
                 $this->stdout(sprintf("`make $type` doesn’t support the %s %s.\n", implode(' ', $usedParams), $usedParamCount === 1 ? 'option' : 'options'), Console::FG_RED);
                 return ExitCode::UNSPECIFIED_ERROR;
@@ -183,35 +170,25 @@ class Command extends Controller
             $baseNamespace = null;
         } else {
             if ($usedParamCount === 0) {
-                $this->stdout("`make $type` must specify an --plugin, --module, --app, or --path option.\n", Console::FG_RED);
+                $this->stdout("`make $type` must specify a --plugin, --app, or --path option.\n", Console::FG_RED);
                 return ExitCode::UNSPECIFIED_ERROR;
             } elseif ($usedParamCount !== 1) {
-                $this->stdout("`make $type` must only specify --plugin, --module, --app, or --path, but not multiple.\n", Console::FG_RED);
+                $this->stdout("`make $type` must only specify --plugin, --app, or --path, but not multiple.\n", Console::FG_RED);
                 return ExitCode::UNSPECIFIED_ERROR;
             }
 
             if ($this->_path) {
                 $basePath = FileHelper::absolutePath($this->_path, ds: '/');
             } else {
-                if ($this->_app) {
-                    $module = Craft::$app;
-                } elseif ($this->_module) {
-                    $module = Craft::$app->getModule($this->_module);
-                    if (!$module) {
-                        $this->stdout("No module exists with the ID \"$this->_module\". ", Console::FG_RED);
-                        return ExitCode::UNSPECIFIED_ERROR;
-                    }
-                } else {
-                    $pluginsService = Craft::$app->getPlugins();
-                    try {
-                        $module = $pluginsService->getPlugin($this->_plugin) ?? $pluginsService->createPlugin($this->_plugin);
-                    } catch (InvalidPluginException $e) {
-                        $this->stdout($e->getMessage(), Console::FG_RED);
-                        return ExitCode::UNSPECIFIED_ERROR;
-                    }
+                $pluginsService = Craft::$app->getPlugins();
+                try {
+                    $plugin = $pluginsService->getPlugin($this->_plugin) ?? $pluginsService->createPlugin($this->_plugin);
+                } catch (InvalidPluginException $e) {
+                    $this->stdout($e->getMessage(), Console::FG_RED);
+                    return ExitCode::UNSPECIFIED_ERROR;
                 }
 
-                $basePath = FileHelper::normalizePath($module->getBasePath(), '/');
+                $basePath = FileHelper::normalizePath($plugin->getBasePath(), '/');
             }
 
             $composerFile = FileHelper::normalizePath(FileHelper::findClosestFile($basePath, [
@@ -223,7 +200,7 @@ class Command extends Controller
                 return ExitCode::UNSPECIFIED_ERROR;
             }
 
-            // Make sure we have an autoload root that encompasses the module's base path
+            // Make sure we have an autoload root that encompasses the plugin's base path
             $composerDir = dirname($composerFile);
             $baseNamespace = null;
             foreach (Composer::autoloadConfigFromFile($composerFile) as $rootNamespace => $rootPath) {
@@ -258,7 +235,7 @@ class Command extends Controller
         $generator = Craft::createObject([
             'class' => $class,
             'command' => $this,
-            'module' => $module,
+            'plugin' => $plugin,
             'basePath' => $basePath,
             'baseNamespace' => $baseNamespace,
             'composerFile' => $composerFile,
