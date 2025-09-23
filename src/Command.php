@@ -11,6 +11,8 @@ use Craft;
 use craft\composer\InvalidPluginException;
 use craft\console\Controller;
 use craft\events\RegisterComponentTypesEvent;
+use craft\generator\generators\Plugin;
+use craft\generator\generators\WidgetType;
 use craft\generator\helpers\Code;
 use craft\generator\helpers\Composer;
 use craft\helpers\ArrayHelper;
@@ -276,6 +278,12 @@ class Command extends Controller
      */
     private function types(): array
     {
+        // todo
+        return [
+            Plugin::class,
+            WidgetType::class,
+        ];
+
         $types = array_map(
             fn(string $file) => sprintf('craft\\generator\\generators\\%s', pathinfo($file, PATHINFO_FILENAME)),
             FileHelper::findFiles(__DIR__ . '/generators')

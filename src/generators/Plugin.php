@@ -175,14 +175,16 @@ EOD));
             'pattern' => '/^[\d\.]+$/',
         ]);
 
-        if (
-            Comparator::greaterThanOrEqualTo($craftVersion, '4.4.0') &&
-            VersionParser::parseStability($craftVersion) === 'stable'
-        ) {
-            $defaultMinCraftVersion = preg_replace('/^(\d+\.\d+).*/', '$1.0', $craftVersion);
-        } else {
-            $defaultMinCraftVersion = $craftVersion;
-        }
+        // todo
+        $defaultMinCraftVersion = '5.8.0';
+//        if (
+//            Comparator::greaterThanOrEqualTo($craftVersion, '4.4.0') &&
+//            VersionParser::parseStability($craftVersion) === 'stable'
+//        ) {
+//            $defaultMinCraftVersion = preg_replace('/^(\d+\.\d+).*/', '$1.0', $craftVersion);
+//        } else {
+//            $defaultMinCraftVersion = $craftVersion;
+//        }
 
         $this->minCraftVersion = $this->command->prompt('Minimum Craft CMS version:', [
             'default' => $defaultMinCraftVersion,
